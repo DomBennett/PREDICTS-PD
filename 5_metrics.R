@@ -1,0 +1,93 @@
+# 01/11/2014
+# Team PREDICTS-PD
+# Calculate phylo metrics per site
+
+# START
+cat (paste0 ('\nStage 5 started at [', Sys.time (), ']'))
+
+# LIBS
+# always source before dplyr
+source (file.path ('functions', 'tools.R'))
+library (dplyr)
+library (ape)
+
+# DIRS
+input.dirs <- c ('0_data', '3_parse')
+output.dir <- '5_metrics'
+if (!file.exists (output.dir)) {
+  dir.create (output.dir)
+}
+
+# INPUT
+cat ('\nReading in data ....')
+# read in RDS
+predicts.data <- readRDS (file.path (input.dirs[1], 'djb208-2014-08-04-08-40-03.rds'))
+# convert to dplyr format
+predicts.data <- tbl_df (predicts.data)
+# find appropriate sources, stick Source_ID and Study_number together
+predicts.data$SSID <- paste0(predicts.data$Source_ID, '_', predicts.data$Study_number)
+# read in trees
+filenames <- list.files (input.dirs[2])
+studies <- sub ('\\.tre', '', filenames)
+all.trees <- list ()
+for (i in 1:length (studies)) {
+  treedist <- read.tree (file.path (input.dirs[2], filenames[i]))
+  # drop underscores from tip names
+  treedist <- dropUnderscore(treedist)
+  all.trees <- c (all.trees, list (treedist))
+  names (all.trees)[i] <- studies[i]
+}
+cat ('\nDone.')
+
+# PROCESS
+cat ('\nCalculating PD estimates ....')
+study.counter <- 0
+res <- tbl_df (data.frame ())
+for (i in 1:length (studies)) {
+  # progress
+  study <- studies[i]
+  cat ('\n.... study [', study, '], [', i, '/', length (studies), ']',
+       sep = '')
+  
+  # get study data
+  study.data  <- filter (predicts.data, SSID == study)
+  
+  # get tree distribution
+  treedist <- all.trees[study][[1]]
+  tip.labels <- getNames(treedist)
+  
+  # extract community matrix, necessary for commPD
+  cmatrix <- getCommunityMatrix(study.data)
+  
+  # count dropped
+  pdropped <- sum (!colnames (cmatrix) %in% tip.labels)/
+    ncol(cmatrix)
+  
+  # drop species missing in tree distribution
+  cmatrix <- cmatrix[ ,colnames (cmatrix) %in% tip.labels]
+  
+  # calc PD by site for all trees in dist
+  multi.comm.pds <- multiCommPD (phylos=treedist, comm.data=cmatrix,
+                                 type=2, min.spp=0)
+  
+  # get mean and sd PD per site
+  comm.pds <- data.frame (mean = apply (multi.comm.pds, 2, mean, na.rm =TRUE),
+                     sd = apply (multi.comm.pds, 2, sd, na.rm =TRUE))
+  
+  # add results to study.data (this is pretty ugly... oh well)
+  site.counts <- table (select (study.data, Site_number)[ ,1])
+  study.data$Est_mean_PD <- rep (comm.pds[ ,'mean'], site.counts)
+  study.data$Est_sd_PD <- rep (comm.pds[ ,'sd'], site.counts)
+  study.data$PD_pdropped <- pdropped
+  
+  # bind study.data to res
+  res <- rbind (res, study.data)
+}
+cat ('\nDone. Calculated PD estimates for [', study.counter, '] studies.',
+     sep='')
+
+# OUTPUT
+saveRDS (res, file=file.path(output.dir, 'predictsdata_wpd.rds'))
+
+# FINISH
+cat (paste0 ('\nStage 5 finished at [', Sys.time (), ']'))

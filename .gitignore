@@ -1,0 +1,10 @@
+.Rproj.user
+.Rhistory
+.RData
+
+# data files
+0_data/
+1_pGltsetup/
+2_pGltrun/
+3_parse/
+temp/
