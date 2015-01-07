@@ -24,7 +24,6 @@ dropUnderscore <- function (phylos) {
 
 getNames <- function(phylos) {
   # get tip names from a multiphylo
-  # TODO: what to do about different sized trees?
   .get <- function (i) {
     res <<- c (res, phylos[[i]]$tip.label)
   }
@@ -213,6 +212,10 @@ multiCommPD <- function(phylos, comm.data, type = 1, min.spp = 2,
   # Wrapper for commPD that works with multiphylos
   .calc <- function(i) {
     phylo <- phylos[[i]]
+    # normalise edge lengths to sum to 1
+    phylo$edge.length <- phylo$edge.length/sum (phylo$edge.length)
+    # drop names not in comm data
+    comm.data <- comm.data[ ,colnames (comm.data) %in% phylo$tip.label]
     res <- commPD (phylo, comm.data, type, min.spp)
     t (res)
   }

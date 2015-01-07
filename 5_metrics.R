@@ -21,7 +21,7 @@ if (!file.exists (output.dir)) {
 # INPUT
 cat ('\nReading in data ....')
 # read in RDS
-predicts.data <- readRDS (file.path (input.dirs[1], 'djb208-2014-08-04-08-40-03.rds'))
+predicts.data <- readRDS (file.path (input.dirs[1], 'diversity-2014-10-29-03-40-20.rds'))
 # convert to dplyr format
 predicts.data <- tbl_df (predicts.data)
 # find appropriate sources, stick Source_ID and Study_number together
@@ -54,17 +54,14 @@ for (i in 1:length (studies)) {
   
   # get tree distribution
   treedist <- all.trees[study][[1]]
-  tip.labels <- getNames(treedist)
   
   # extract community matrix, necessary for commPD
   cmatrix <- getCommunityMatrix(study.data)
   
-  # count dropped
+  # # estimate spp dropped
+  tip.labels <- getNames (treedist)
   pdropped <- sum (!colnames (cmatrix) %in% tip.labels)/
     ncol(cmatrix)
-  
-  # drop species missing in tree distribution
-  cmatrix <- cmatrix[ ,colnames (cmatrix) %in% tip.labels]
   
   # calc PD by site for all trees in dist
   multi.comm.pds <- multiCommPD (phylos=treedist, comm.data=cmatrix,
