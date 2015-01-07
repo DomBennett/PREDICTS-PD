@@ -2,6 +2,9 @@
 # Team PREDICTS-PD
 # How does PD respond to human impacts?
 
+# START
+cat (paste0 ('\nStage 6 started at [', Sys.time (), ']'))
+
 # LIBS
 library (dplyr)
 
@@ -26,3 +29,6 @@ cat ('Mean [', 1 - mean (predicts.data$PD_pdropped), '] species in tree distritb
 plot (predicts.data$Est_mean_PD~predicts.data$Use_intensity)  # VERY crude plot
 
 # OUTPUT
+
+# FINISH
+cat (paste0 ('\nStage 6 finished at [', Sys.time (), ']'))
