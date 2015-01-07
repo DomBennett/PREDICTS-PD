@@ -27,16 +27,7 @@ predicts.data <- tbl_df (predicts.data)
 # find appropriate sources, stick Source_ID and Study_number together
 predicts.data$SSID <- paste0(predicts.data$Source_ID, '_', predicts.data$Study_number)
 # read in trees
-filenames <- list.files (input.dirs[2])
-studies <- sub ('\\.tre', '', filenames)
-all.trees <- list ()
-for (i in 1:length (studies)) {
-  treedist <- read.tree (file.path (input.dirs[2], filenames[i]))
-  # drop underscores from tip names
-  treedist <- dropUnderscore(treedist)
-  all.trees <- c (all.trees, list (treedist))
-  names (all.trees)[i] <- studies[i]
-}
+all.trees <- readInTrees (folder = input.dirs[2])
 cat ('\nDone.')
 
 # PROCESS
