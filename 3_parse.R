@@ -1,36 +1,54 @@
-## 01/11/2014
-## Team PREDICTS-PD
-## Read in pG-lt trees and make ultrametric
+# 01/11/2014
+# Team PREDICTS-PD
+# Read in pG-lt trees and make ultrametric
 
 # START
-cat (paste0 ('\nStage 1 started at [', Sys.time (), ']'))
+cat (paste0 ('\nStage 3 started at [', Sys.time (), ']'))
 
-## Libs
+# LIBS
 library (ape)
 
-## Dirs
+# DIRS
 input.dir <- '2_pGltRun'
 output.dir <- '3_parse'
 if (!file.exists (output.dir)) {
   dir.create (output.dir)
 }
 
-## Input
-# read in dist for each study
+# INPUT
+cat ('\nReading trees for each study ....')
+tree.counter <- 0
 studies <- list.files (input.dir)
 trees <- list ()
 for (study in studies) {
-  treedist <- read.tree (file.path (input.dir, study, '4_phylogeny', 'distribution.tre'))
-  trees <- c (trees, list (treedist))
-  names (trees)[length (trees)] <- study
+  fpath <- file.path (input.dir, study, '4_phylogeny', 'distribution.tre')
+  treedist <- suppressWarnings (try (read.tree (fpath), silent = TRUE))
+  if (class (treedist) != 'try-error') {
+    trees <- c (trees, list (treedist))
+    names (trees)[length (trees)] <- study
+    tree.counter <- tree.counter + 1
+  }
 }
+cat ('\nDone.')
 
-## Make ultrametric (TODO)
-# chronos or chrnonsML -- which is better?
+# MAKE ULTRAMETRIC
+cat ('\nRate-smoothing ....')
+smooth.counter <- 0
+# TODO: chronos or chrnonsML -- which is better?
+cat ('\nDone.')
 
-## Output
+# OUTPUT
+cat ('\nWriting out ....')
 for (i in 1:length (trees)) {
   treedist <- trees[[i]]
   filename <- paste0 (names (trees)[i], '.tre')
   write.tree (file = file.path (output.dir, filename), phy = treedist)
 }
+cat ('Done. Discovered [', length (studies),
+     '] studies of which [', tree.counter,
+     '] had tree distirbutions that were read in and [',
+     smooth.counter, '] were rate-smoothed.',
+     sep='')
+
+# FINISH
+cat (paste0 ('\nStage 3 finished at [', Sys.time (), ']'))
