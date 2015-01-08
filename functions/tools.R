@@ -50,7 +50,7 @@ findBestRef <- function (tip.labels, ref.trees) {
     ptips[i] <- sum (ref.trees[[i]]$tip.label %in% tip.labels)/length (tip.labels)
   }
   besti <- which (ptips == max (ptips))[1]
-  ref.trees[[besti]]
+  ref.trees[besti]
 }
 
 getNames <- function(phylos) {

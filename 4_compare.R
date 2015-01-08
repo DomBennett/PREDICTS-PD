@@ -29,8 +29,8 @@ cat ('\nDone.')
 
 # PROCESS
 cat ('\nCalculating shared nodes ....')
-# calculate the proportion of nodes in the pglt tree that differ from the best pub tree
-different.nodes <- tot.nodes <- rep (NA, length (pglt.trees))
+# calculate the proportion of nodes/branch in the pglt tree that differ from the best pub tree
+different.branch <- different.nodes <- tot.nodes <- ref.trees <- rep (NA, length (pglt.trees))
 for (i in 1:length (pglt.trees)) {
   cat ('\n.... tree [', i, '/', length (pglt.trees), ']', sep = '')
   # get dist
@@ -38,31 +38,52 @@ for (i in 1:length (pglt.trees)) {
   tip.labels <- getNames (treedist)
   # find best reference tree
   ref.tree <- findBestRef (tip.labels, pub.trees)
+  ref.trees[i] <- names (ref.tree)[1]
+  ref.tree <- ref.tree[[1]]
   # for each in dist, break down to same sized tree and calc topo dist
-  temp.tot.nodes <- temp.different.nodes <- rep (NA, length (treedist))
+  temp.tot.nodes <- temp.different.nodes <- temp.different.branch <-
+    rep (NA, length (treedist))
   for (j in 1:length (treedist)) {
     tree <- treedist[[j]]
     if (sum (tree$tip.label %in% ref.tree$tip.label) >= min.tree) {
+      # break down to comparable trees
       tree1 <- drop.tip (ref.tree, tip = ref.tree$tip.label[!ref.tree$tip.label %in% tree$tip.label])
       tree2 <- drop.tip (tree, tip = tree$tip.label[!tree$tip.label %in% tree1$tip.label])
+      # calculate topo.dist
       temp.different.nodes[j] <- dist.topo (tree1, tree2)
       temp.tot.nodes[j] <- (tree1$Nnode + tree2$Nnode)/2
-    } else {
-      temp.different.nodes[j] <- NA
-      temp.tot.nodes[j] <- NA
+      # calculate branch dist
+      if (!is.null (tree1$edge.length)) {
+        # scale both to 1
+        tree1$edge.length <- tree1$edge.length/sum (tree1$edge.length)
+        tree2$edge.length <- tree2$edge.length/sum (tree2$edge.length)
+        temp.different.branch[j] <- dist.topo (tree1, tree2, 'score')
+      }
     }
   }
   different.nodes[i] <- mean (temp.different.nodes, na.rm = TRUE)
   tot.nodes[i] <- mean (temp.tot.nodes, na.rm = TRUE)
+  different.branch[i] <- mean (temp.different.branch, na.rm = TRUE)
 }
-p.shared.nodes <- 1 - mean (different.nodes/tot.nodes, na.rm = TRUE)
-p.shared.nodes.sd <- sd (different.nodes/tot.nodes, na.rm = TRUE)
-cat ('\nDone. [', p.shared.nodes, '±', p.shared.nodes.sd, '] shared nodes.', sep = '')
+p.different.branch <- mean (different.branch, na.rm = TRUE)
+p.different.branch.sd <- sd (different.branch, na.rm = TRUE)
+p.different.nodes <- mean (different.nodes/tot.nodes, na.rm = TRUE)
+p.different.nodes.sd <- sd (different.nodes/tot.nodes, na.rm = TRUE)
+cat ('\nDone. [', p.different.nodes, '±', p.different.nodes.sd, '] different nodes and [',
+     p.different.branch, '±',  p.different.branch.sd, '] different branch.', sep = '')
 # plot (tot.nodes, different.nodes)
 
-# TODO: do same with RF dist:
-#  -- essentially the same as topo.dist but each node difference is also weighted by its branch -- should give a better result
-#  -- requires both the reference and the subject trees to be ultramteric
+# OUTPUT
+pdf (file.path (output.dir, 'comparisons.pdf'))
+pull <- !is.na (different.branch)
+plot (different.branch[pull] ~ factor(ref.trees[pull]), xlab = 'Comparison Tree',
+      ylab = 'Proportion of different branch')
+pull <- !is.na (different.nodes)
+plot ((different.nodes[pull]/tot.nodes[pull]) ~ factor(ref.trees[pull]), xlab = 'Comparison Tree',
+      ylab = 'Proportion of different nodes')
+dev.off ()
+save (different.branch, different.nodes, tot.nodes, ref.trees,
+      file = file.path (output.dir, 'results.RData'))
 
 # FINISH
 cat (paste0 ('\nStage 4 finished at [', Sys.time (), ']'))
