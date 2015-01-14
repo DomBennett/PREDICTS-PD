@@ -120,7 +120,7 @@ for (i in 1:nrow (sources)) {
   if (!file.exists (temp.dir)) {
     dir.create (temp.dir)
   }
-  names <- select (filter (x, SSID == study), Parsed_name)[ ,1]
+  names <- select (filter (x, SSID == study), Best_guess_binomial)[ ,1]
   names <- unique (as.character (names))
   write.table (names, file = file.path (temp.dir, 'names.txt'),
                col.names = FALSE, row.names = FALSE, quote = FALSE)
