@@ -9,7 +9,7 @@ min.tree <- 5  # minimum number of tips in a tree for reference
 cat (paste0 ('\nStage 4 started at [', Sys.time (), ']'))
 
 # LIBS
-library (ape)
+library (MoreTreeTools)
 source (file.path ('functions', 'tools.R'))
 
 # DIRS
@@ -29,8 +29,10 @@ cat ('\nDone.')
 
 # PROCESS
 cat ('\nCalculating shared nodes ....')
-# calculate the proportion of nodes/branch in the pglt tree that differ from the best pub tree
-different.branch <- different.nodes <- tot.nodes <- ref.trees <- rep (NA, length (pglt.trees))
+# calculate distances between pglt tree and the best pub tree
+ph85 <- score <- dmat <- ntaxa <- etaxa <- ref.trees <-
+  rep (NA, length (pglt.trees) * 100)
+c <- 1
 for (i in 1:length (pglt.trees)) {
   cat ('\n.... tree [', i, '/', length (pglt.trees), ']', sep = '')
   # get dist
@@ -38,52 +40,89 @@ for (i in 1:length (pglt.trees)) {
   tip.labels <- getNames (treedist)
   # find best reference tree
   ref.tree <- findBestRef (tip.labels, pub.trees)
-  ref.trees[i] <- names (ref.tree)[1]
+  ref.trees[c:(c + 99)] <- rep (names (ref.tree)[1], 100)
   ref.tree <- ref.tree[[1]]
-  # for each in dist, break down to same sized tree and calc topo dist
-  temp.tot.nodes <- temp.different.nodes <- temp.different.branch <-
-    rep (NA, length (treedist))
   for (j in 1:length (treedist)) {
     tree <- treedist[[j]]
-    if (sum (tree$tip.label %in% ref.tree$tip.label) >= min.tree) {
-      # break down to comparable trees
-      tree1 <- drop.tip (ref.tree, tip = ref.tree$tip.label[!ref.tree$tip.label %in% tree$tip.label])
-      tree2 <- drop.tip (tree, tip = tree$tip.label[!tree$tip.label %in% tree1$tip.label])
-      # calculate topo.dist
-      temp.different.nodes[j] <- dist.topo (tree1, tree2)
-      temp.tot.nodes[j] <- (tree1$Nnode + tree2$Nnode)/2
-      # calculate branch dist
-      if (!is.null (tree1$edge.length)) {
-        # scale both to 1
-        tree1$edge.length <- tree1$edge.length/sum (tree1$edge.length)
-        tree2$edge.length <- tree2$edge.length/sum (tree2$edge.length)
-        temp.different.branch[j] <- dist.topo (tree1, tree2, 'score')
-      }
+    shared.ntaxa <- sum (tree$tip.label %in% ref.tree$tip.label)
+    if (shared.ntaxa >= min.tree) {
+      res <- calcDist (tree, ref.tree)
+      ph85[c] <- res[['PH85']]
+      score[c] <- res[['score']]
+      dmat[c] <- res[['dmat']]
+      ntaxa[c] <- shared.ntaxa
+      etaxa[c] <- getSize (tree) - shared.ntaxa
     }
+    c <- c + 1
   }
-  different.nodes[i] <- mean (temp.different.nodes, na.rm = TRUE)
-  tot.nodes[i] <- mean (temp.tot.nodes, na.rm = TRUE)
-  different.branch[i] <- mean (temp.different.branch, na.rm = TRUE)
 }
-p.different.branch <- mean (different.branch, na.rm = TRUE)
-p.different.branch.sd <- sd (different.branch, na.rm = TRUE)
-p.different.nodes <- mean (different.nodes/tot.nodes, na.rm = TRUE)
-p.different.nodes.sd <- sd (different.nodes/tot.nodes, na.rm = TRUE)
-cat ('\nDone. [', p.different.nodes, '±', p.different.nodes.sd, '] different nodes and [',
-     p.different.branch, '±',  p.different.branch.sd, '] different branch.', sep = '')
-# plot (tot.nodes, different.nodes)
+p.ph85.mean <- mean (ph85, na.rm = TRUE)
+p.ph85.sd <- sd (ph85, na.rm = TRUE)
+p.score.mean <- mean (score, na.rm = TRUE)
+p.score.sd <- sd (score, na.rm = TRUE)
+p.dmat.mean <- mean (dmat, na.rm = TRUE)
+p.dmat.sd <- sd (dmat, na.rm = TRUE)
+p.etaxa.mean <- mean (etaxa / (ntaxa + etaxa), na.rm = TRUE)
+p.etaxa.sd <- mean (etaxa / (ntaxa + etaxa), na.rm = TRUE)
+cat ('\nDone....')
+cat ('[', p.ph85.mean, '±', p.ph85.sd, '] PH85', sep='')
+cat ('[', p.score.mean, '±', p.score.sd, '] score', sep='')
+cat ('[', p.dmat.mean, '±', p.dmat.sd, '] dmat', sep='')
+cat ('[', p.etaxa.mean, '±', p.etaxa.sd, '] extra taxa in pG-lt trees', sep='')
 
 # OUTPUT
+cat ('\nPlotting and summarising ....')
+# quick ggplot boxplot function
+ggBoxplot <- function (dist.metric, ylab) {
+  pull <- !is.na (get (dist.metric))
+  p <- ggplot (plot.data[pull, ], aes_string ('Comparison_Tree', dist.metric))
+  p <- p + geom_boxplot (aes (fill = Comparison_Tree)) +
+    ylab (ylab) + theme_bw () +
+    theme (axis.text.x = element_blank(), axis.title.x = element_blank())
+  print (p)
+}
+# quick ggplot scatter for showing relation to ntaxa
+ggScatter <- function (dist.metric, ylab) {
+  i <- which (colnames(plot.data) == dist.metric)
+  colnames(plot.data)[i] <- 'dist.metric'
+  temp <- ddply (plot.data, .variables=.(study, Comparison_Tree, ntaxa),
+                 .fun=summarize, mean = mean (dist.metric, na.rm = TRUE),
+                 se = sd (dist.metric, na.rm = TRUE) / sqrt (length (dist.metric)))
+  limits <- aes (colour = Comparison_Tree, ymax = mean + se,
+                 ymin = mean - se)
+  pull <- !is.na (temp$mean)
+  p <- ggplot (temp[pull,], aes (x = ntaxa, y = mean))
+  p <- p + geom_point (aes (colour = Comparison_Tree)) +
+    geom_errorbar(limits, width=0.2) +
+    stat_smooth (method = 'lm') + xlab ('N. taxa') +
+    ylab (ylab) +
+    theme_bw ()
+  print (p)
+  bytaxa <- ddply (temp, .(Comparison_Tree), summarize,
+                   mean = mean (mean, na.rm = TRUE))
+  cat ('\n.... results for [', dist.metric, ']', sep = '')
+  for (i in 1:nrow (bytaxa)) {
+    cat ('\n........ ', as.character (bytaxa[[i, 'Comparison_Tree']]),
+         ' = [', bytaxa[[i, 'mean']], ']',
+         sep = '')
+  }
+}
+# open filehandle
 pdf (file.path (output.dir, 'comparisons.pdf'))
-pull <- !is.na (different.branch)
-plot (different.branch[pull] ~ factor(ref.trees[pull]), xlab = 'Comparison Tree',
-      ylab = 'Proportion of different branch')
-pull <- !is.na (different.nodes)
-plot ((different.nodes[pull]/tot.nodes[pull]) ~ factor(ref.trees[pull]), xlab = 'Comparison Tree',
-      ylab = 'Proportion of different nodes')
+# make gg dataset and print boxplots
+study <- rep (1:length (pglt.trees), each = 100)
+plot.data <- data.frame (ph85, score, dmat, ntaxa, study,
+                         Comparison_Tree = factor (ref.trees))
+ggBoxplot ('ph85', 'PH85 (P. Internal Branches)')
+ggBoxplot ('score', 'Score (P. Internal Branches w/ Length)')
+ggBoxplot ('dmat', 'Distance of cophenetic matrices')
+ggScatter ('ph85', 'PH85 (P. Internal Branches) (±SE)')
+ggScatter ('score', 'Score (P. Internal Branches w/ Length) (±SE)')
+ggScatter ('dmat', 'Distance of cophenetic matrices (±SE)')
 dev.off ()
-save (different.branch, different.nodes, tot.nodes, ref.trees,
+save (ph85, score, dmat, ref.trees, ntaxa,
       file = file.path (output.dir, 'results.RData'))
+cat ('\nDone.')
 
 # FINISH
 cat (paste0 ('\nStage 4 finished at [', Sys.time (), ']'))
