@@ -11,7 +11,7 @@ source (file.path ('functions', 'tools.R'))
 library (dplyr)
 
 # PARAMETERS
-easy.names <- TRUE  # setup for 'easy' names?
+reference.batch <- FALSE  # setup for reference batch?
 non.sp.tol <- 0.5  # the maximum proportion of names resolved above the species level
 non.sci.tol <- 0.5  # the maximum proportion of non-scientific names
 
@@ -25,8 +25,7 @@ if (!file.exists (output.dir)) {
 # INPUT
 cat ('\nReading in data ....')
 # read in RDS
-x <- readRDS (file.path (input.dir, 'diversity-2014-10-29-03-40-20.rds'))  # TODO: what's the difference between this and sites-*.rds?
-# x <- readRDS (file.path (input.dir, 'djb208-2014-08-04-08-40-03.rds'))  # urban data
+x <- readRDS (file.path (input.dir, 'diversity-2014-10-29-03-40-20.rds'))
 # convert to dplyr format
 x <- tbl_df (x)
 cat ('\nDone.')
@@ -35,84 +34,57 @@ cat ('\nDone.')
 cat ('\nManipulating data ....')
 # find appropriate sources, stick Source_ID and Study_number together
 x$SSID <- paste0(x$Source_ID, '_', x$Study_number)
+# group
 sources <- group_by (x, SSID)
-sources <- summarise (sources, N.names = n_distinct (Parsed_name))
-# take only studies with more than 5 names
-sources <- filter (sources, N.names >= 5)
+# summarise
+sources <- summarise (sources, N_names = n_distinct (Parsed_name),
+                      Class_ex = first (Class), N_classes = n_distinct(Class),
+                      Order_ex = first (Order), N_orders = n_distinct(Order),
+                      Family_ex = first (Family), N_families = n_distinct(Family),
+                      Genus_ex = first (Genus), N_genera = n_distinct(Genus),
+                      P_sp_names = 1 - (sum ('' == Species)/n()),
+                      P_sci_names = sum ('Scientific' == Resolution_entered)/n())
 cat ('\nDone.')
+
+# FILTER
+cat ('\nFiltering data ....')
+filtered <- filter (sources, P_sp_names >= non.sp.tol)
+filtered <- filter (filtered, P_sci_names >= non.sci.tol)
+filtered <- filter (filtered, N_names > 5)
+filtered <- filter (filtered, N_classes == 1)  # only 1 class
+if (reference.batch) {
+  birds <- filter (filtered, Class_ex == 'Aves')
+  bees <- filter (filtered, Order_ex == 'Hymenoptera')
+  mammals <- filtered <- filter (filtered, Class_ex == 'Mammalia')
+  filtered <- rbind (birds, mammals)
+}
+cat ('\nDone. [', nrow (filtered), '] suitable stuides identified.', sep = '')
 
 # EXTRACT NAMES AND SAVE
 cat ('\nExtracting names ....')
-#TODO: deal with studies holding the same names
+# use these to extract parent
+taxa.counters <- c ('N_classes', 'N_orders', 'N_families', 'N_genera')
+taxa.names <- c ('Class_ex', 'Order_ex', 'Family_ex', 'Genus_ex')
+# counters for stats out
 study.counter <- 0
 names.counter <- 0
-for (i in 1:nrow (sources)) {
+# convert dplyr to data.frame
+metadata <- data.frame (filtered, stringsAsFactors = FALSE)
+for (i in 1:nrow (metadata)) {
   # study ID
-  study <- sources$SSID[i]
-  
+  study <- metadata$SSID[i]
   # progress
-  cat ('\n.... study [', study, '], [', i, '/', nrow(sources), ']', sep = '')
-  
-  # filter out those studies with too few species level names
-  species <- as.character (select (filter (x, SSID == study), Species)[ ,1])
-  # calc proportion of absent species names
-  if (sum ('' == species)/length (species) > non.sp.tol) {
-    next
-  }
-  
-  # filter out non-scientific names (at the moment pglt can't handle common names)
-  resolutions <- as.character (select (filter (x, SSID == study), Resolution_entered)[ ,1])
-  # calc proportion of non-scientific names
-  if (sum ('Scientific' != resolutions)/length (resolutions) > non.sci.tol) {
-    next
-  }
-  
-  
-  # create taxonomic tbl_df
-  taxon <- select (filter (x, SSID == study), Genus, Family, Order, Class)
-  
-  # EASY NAMES filter
-  if (easy.names) {
-    # only easy groups: Aves (class), Mammalia (class), Hymenoptera (class)
-    continue <- FALSE
-    if (all (taxon$Order == 'Hymenoptera')) {
-      continue <- TRUE
-    }
-    if (all (taxon$Class == 'Mammalia')) {
-      continue <- TRUE
-    }
-    if (all (taxon$Class == 'Aves')) {
-      continue <- TRUE
-    }
-    if (!continue) {
-      next
-    }
-  }
-  
+  cat ('\n.... study [', study, '], [', i, '/', nrow(metadata), ']', sep = '')
   # find lowest shared taxonomic group -- the parent
-  for (j in 1:ncol (taxon)) {
-    if (any (taxon[ ,j] == '') ||
-          length (unique (taxon[ ,j])) > 1) {
-      next
-    }
-    parent <- unique (taxon[ ,j])
-    break
-  }
-  if (length (parent) > 1) {
-    cat (paste0 ('\nMore than 1 higher taxon for [',
-                 study,'] -- skipping'))
-    next
-  }
-  
+  pull <- which (metadata[i, taxa.counters] == 1)
+  parent <- metadata[i, taxa.names][[pull[length (pull)]]]
   # get parentid -- this is necessary for names resolution in pglt
   resolved <- taxaResolve (names = as.character (parent))
   parentid <- resolved$taxid
   if (length (parentid) > 1) {
-    cat (paste0 ('\nMore than 1 higher taxon txid for [',
-                 study,'] -- skipping'))
+    cat ('\n.... multiple resolutions for higher taxon')
     next
   }
-  
   # write out parameters.csv and names.txt for pglt
   parameters <- data.frame (Parameter = 'parentid',
                             Value = parentid, Note = parent)
@@ -120,7 +92,7 @@ for (i in 1:nrow (sources)) {
   if (!file.exists (temp.dir)) {
     dir.create (temp.dir)
   }
-  names <- select (filter (x, SSID == study), Best_guess_binomial)[ ,1]
+  names <- as.data.frame (filter (x, SSID == study))$Parsed_name
   names <- unique (as.character (names))
   write.table (names, file = file.path (temp.dir, 'names.txt'),
                col.names = FALSE, row.names = FALSE, quote = FALSE)
