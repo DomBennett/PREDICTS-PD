@@ -82,7 +82,7 @@ for (i in 1:nrow (metadata)) {
   resolved <- taxaResolve (names = as.character (parent))
   parentid <- resolved$taxid
   if (length (parentid) > 1) {
-    cat ('\n.... multiple resolutions for higher taxon')
+    cat ('\n.... unable to resolve parent taxonomic group')
     next
   }
   # write out parameters.csv and names.txt for pglt
