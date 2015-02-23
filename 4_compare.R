@@ -9,8 +9,7 @@ min.tree <- 5  # minimum number of tips in a tree for reference
 cat (paste0 ('\nStage 4 started at [', Sys.time (), ']'))
 
 # LIBS
-library (MoreTreeTools)
-source (file.path ('functions', 'tools.R'))
+source (file.path ('tools', 'tree_tools.R'))
 
 # DIRS
 input.dirs <- c ('0_data', '3_parse')
