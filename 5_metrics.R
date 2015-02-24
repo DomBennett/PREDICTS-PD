@@ -70,6 +70,7 @@ for (i in 1:length (all.trees)) {
   study.data$PD_pdropped <- pdropped
   # bind study.data to res
   res <- rbind (res, study.data)
+  study.counter <- study.counter + 1
 }
 cat ('\nDone. Calculated PD estimates for [', study.counter, '] studies.',
      sep='')
