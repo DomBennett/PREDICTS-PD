@@ -19,6 +19,7 @@ if (!'devtools' %in% packages) {
   counter <- counter + 1
 }
 if (!'MoreTreeTools' %in% packages) {
+  library (devtools)
   install_github ('https://github.com/DomBennett/MoreTreeTools.git')
   counter <- counter + 1
 }
