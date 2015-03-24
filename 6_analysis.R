@@ -6,7 +6,6 @@
 cat (paste0 ('\nStage 6 started at [', Sys.time (), ']'))
 
 # LIBS
-library (dplyr)
 library(lme4)
 library (ggplot2)
 library (multcomp)
