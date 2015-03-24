@@ -1,7 +1,23 @@
-# 23/02/2015
-# Explore, move, and investigate pG-lt folders
+# NOT FOR SOURCING
 
-# EXTRACTING EASY BATCH, GETTING FINAL BATCH
+# 09/03/2015 -- MOVING FOLDERS GIVEN STUDY NAME CHANGE
+easy.folders <- list.files ('FINAL-BATCH')
+full.folders <- list.files ('FULL-BATCH')
+# loop through each easy folder, find match in full and move contents
+for (i in 1:length (easy.folders)) {
+  easy.folder <- easy.folders[i]
+  pattern <- paste0 ('^', easy.folder)
+  pull <- grepl (pattern, full.folders)
+  if (any (pull)) {
+    full.folder <- full.folders[pull]
+    system (paste ("cp -r", file.path ('FINAL-BATCH', easy.folder, ''),
+                   file.path ('FULL-BATCH', full.folder, '')))
+  } else {
+    stop (easy.folder)
+  }
+}
+
+# 23/02/2015 -- EXTRACTING EASY BATCH, GETTING FINAL BATCH
 # all folders that can be run
 setup.folders <- list.files ('1_pGltsetup')
 # current folders that have been run (easy batch)
@@ -20,7 +36,7 @@ for (folder in final.batch) {
   system (paste ("cp -r", file.path('1_pGltsetup', folder), 'FINAL-BATCH/'))
 }
 
-# WORKING OUT RUN SUCCESSES
+# 23/02/2015 -- WORKING OUT RUN SUCCESSES
 completed <- 0
 for (folder in run.folders) {
   if (file.exists (file.path ('2_pGltrun', folder, '4_phylogeny',
