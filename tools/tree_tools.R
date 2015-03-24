@@ -6,17 +6,27 @@
 library (MoreTreeTools)
 
 # FUNCTIONS
-readInTrees <- function (folder) {
+readInTrees <- function (folder, recursive=FALSE) {
   # point at a folder, it will return a list of trees in that folder
+  all.trees <- list ()
+  if (recursive) {
+    dirs <- list.dirs (folder, full.names=FALSE)[-1]
+    for (i in 1:length (dirs)) {
+      treedist <- readInTrees (file.path (folder, dirs[i]))
+      all.trees <- c (all.trees, list (treedist))
+      names (all.trees)[i] <- dirs[i]
+    }
+  }
   filenames <- list.files (path = folder, pattern = '\\.tre')
   studies <- sub ('\\.tre', '', filenames)
-  all.trees <- list ()
-  for (i in 1:length (studies)) {
-    treedist <- read.tree (file.path (folder, filenames[i]))
-    # drop underscores from tip names
-    treedist <- dropUnderscore(treedist)
-    all.trees <- c (all.trees, list (treedist))
-    names (all.trees)[i] <- studies[i]
+  if (length (studies) > 0) {
+    for (i in 1:length (studies)) {
+      treedist <- read.tree (file.path (folder, filenames[i]))
+      # drop underscores from tip names
+      treedist <- dropUnderscore(treedist)
+      all.trees <- c (all.trees, list (treedist))
+      names (all.trees)[i] <- studies[i]
+    }
   }
   all.trees
 }
@@ -45,8 +55,11 @@ findBestRef <- function (tip.labels, ref.trees) {
   for (i in 1:length (ref.trees)) {
     ptips[i] <- sum (ref.trees[[i]]$tip.label %in% tip.labels)/length (tip.labels)
   }
-  besti <- which (ptips == max (ptips))[1]
-  ref.trees[besti]
+  if (any (ptips > 0)) {
+    besti <- which (ptips == max (ptips))[1]
+    return (ref.trees[besti])
+  }
+  return (NULL)
 }
 
 getNames <- function(phylos) {
