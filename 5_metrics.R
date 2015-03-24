@@ -20,60 +20,97 @@ if (!file.exists (output.dir)) {
 cat ('\nReading in data ....')
 # read in RDS
 predicts.data <- readRDS (file.path (input.dirs[1], 'diversity-2014-10-29-03-40-20.rds'))
-# find appropriate sources, stick Source_ID and Study_number together
-predicts.data$SSID <- paste0(predicts.data$Source_ID, '_', predicts.data$Study_number)
+# get SSID
+predicts.data$SSID <- paste0 (predicts.data$Source_ID, '_',
+                              predicts.data$Study_number, '_',
+                              predicts.data$Class)
 # read in trees
-all.trees <- readInTrees (folder = input.dirs[2])
+trees <- readInTrees (folder=input.dirs[2], recursive=TRUE)
 cat ('\nDone.')
 
 # PROCESS
 cat ('\nCalculating PD estimates ....')
 study.counter <- 0
 res <- data.frame ()
-for (i in 1:length (all.trees)) {
+for (i in 1:length (trees)) {
   # progress
-  study <- names (all.trees)[i]
-  cat ('\n.... study [', study, '], [', i, '/', length (all.trees), ']',
+  study <- names (trees)[i]
+  cat ('\n.... study [', study, '], [', i, '/', length (trees), ']',
        sep = '')
   # get study data
   study.data  <- predicts.data[predicts.data$SSID == study, ]
-  # get tree distribution
-  treedist <- all.trees[[i]]
   # extract community matrix, necessary for commPD
   cmatrix <- getCommunityMatrix(study.data)
-  # # estimate spp dropped
-  tip.labels <- getNames (treedist)
-  pdropped <- sum (!colnames (cmatrix) %in% tip.labels)/
-    ncol(cmatrix)
-  # calc phylogenetic metrics per site for all trees in dist
-  phymets.res <- data.frame (PD1.mean=rep(NA, nrow(cmatrix)),
-                             PD1.sd=rep(NA, nrow(cmatrix)),
-                             PSV.mean=rep(NA, nrow(cmatrix)),
-                             PSV.sd=rep(NA, nrow(cmatrix)),
-                             PSE.mean=rep(NA, nrow(cmatrix)),
-                             PSE.sd=rep(NA, nrow(cmatrix)))
-  for (metric in c( 'PD1', 'PSV', 'PSE')) {
-    multi <- multiCommPhyMets (trees=treedist, cmatrix=cmatrix, metric=metric)
-    # get mean and sd per site
-    phymets.res[ ,paste0 (metric, '.mean')] <-  apply (multi, 2, mean, na.rm =TRUE)
-    phymets.res[ ,paste0 (metric, '.sd')] <-  apply (multi, 2, sd, na.rm =TRUE)
+  # calculate stats for each set of trees
+  phymets.res <- list ()
+  for (j in 1:length (trees[[i]])) {
+    treedist <- trees[[i]][[j]]
+    prefix <- names (trees[[i]])[j]
+    phymets.res[[prefix]] <- list ()
+    # estimate spp dropped
+    tip.labels <- getNames (treedist)
+    pdropped <- sum (!colnames (cmatrix) %in% tip.labels)/
+      ncol(cmatrix)
+    phymets.res[[prefix]][['pdropped']] <- pdropped
+    # calc phylogenetic metrics per site for all trees in dist
+    for (metric in c( 'PD1', 'PSV', 'PSE')) {
+      multi <- multiCommPhyMets (trees=treedist, cmatrix=cmatrix,
+                                 metric=metric)
+      # get mean and sd per site
+      phymets.res[[prefix]][[paste0 (metric, '_mean')]] <-
+        apply (multi, 2, mean, na.rm =TRUE)
+      phymets.res[[prefix]][[paste0 (metric, '_sd')]] <-
+        apply (multi, 2, sd, na.rm =TRUE)
+    }
   }
   # add results to study.data
+  # TODO: is there a better way of doing this?
+  #  This is something I don't like about R
   site.counts <- table (study.data$Site_number)
-  study.data$Est_mean_PD <- rep (phymets.res$PD1.mean, site.counts)
-  study.data$Est_sd_PD <- rep (phymets.res$PD1.sd, site.counts)
-  study.data$Est_mean_PSV <- rep (phymets.res$PSV.mean, site.counts)
-  study.data$Est_sd_PSV <- rep (phymets.res$PSV.sd, site.counts)
-  study.data$Est_mean_PSE <- rep (phymets.res$PSE.mean, site.counts)
-  study.data$Est_sd_PSE <- rep (phymets.res$PSE.sd, site.counts)
-  # add pdropped to study.data
-  study.data$PD_pdropped <- pdropped
+  study.data$pglt_mean_PD <-
+    rep (phymets.res$pglt$PD1_mean, site.counts)
+  study.data$pglt_sd_PD <-
+    rep (phymets.res$pglt$PD1_sd, site.counts)
+  study.data$pglt_mean_PSV <-
+    rep (phymets.res$pglt$PSV_mean, site.counts)
+  study.data$pglt_sd_PSV <-
+    rep (phymets.res$pglt$PSV_sd, site.counts)
+  study.data$pglt_mean_PSE <-
+    rep (phymets.res$pglt$PSE_mean, site.counts)
+  study.data$pglt_sd_PSE <-
+    rep (phymets.res$pglt$PSE_sd, site.counts)
+  study.data$pglt_pdropped <-
+      phymets.res$pglt$pdropped
+  if ('mapped' %in% names (phymets.res)) {
+    study.data$mapped_mean_PD <-
+      rep (phymets.res$mapped$PD1_mean, site.counts)
+    study.data$mapped_sd_PD <-
+      rep (phymets.res$mapped$PD1_sd, site.counts)
+    study.data$mapped_mean_PSV <-
+      rep (phymets.res$mapped$PSV_mean, site.counts)
+    study.data$mapped_sd_PSV <-
+      rep (phymets.res$mapped$PSV_sd, site.counts)
+    study.data$mapped_mean_PSE <-
+      rep (phymets.res$mapped$PSE_mean, site.counts)
+    study.data$mapped_sd_PSE <-
+      rep (phymets.res$mapped$PSE_sd, site.counts)
+    study.data$mapped_pdropped <-
+      phymets.res$mapped$pdropped
+  } else {
+    study.data$mapped_mean_PD <- rep (NA, nrow (study.data))
+    study.data$mapped_sd_PD <- rep (NA, nrow (study.data))
+    study.data$mapped_mean_PSV <- rep (NA, nrow (study.data))
+    study.data$mapped_sd_PSV <- rep (NA, nrow (study.data))
+    study.data$mapped_mean_PSE <- rep (NA, nrow (study.data))
+    study.data$mapped_sd_PSE <- rep (NA, nrow (study.data))
+    study.data$mapped_pdropped <- rep (NA, nrow (study.data))
+  }
   # bind study.data to res
   res <- rbind (res, study.data)
   study.counter <- study.counter + 1
 }
-cat ('\nDone. Calculated PD estimates for [', study.counter, '] studies.',
-     sep='')
+cat ('\nDone. Calculated PD estimates for [',
+     study.counter, '] studies.', sep='')
 
 # OUTPUT
 saveRDS (res, file=file.path(output.dir, 'predictsdata_wpd.rds'))
