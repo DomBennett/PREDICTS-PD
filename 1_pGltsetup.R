@@ -7,7 +7,7 @@ cat (paste0 ('\nStage 1 started at [', Sys.time (), ']'))
 
 # LIBS
 # source before dplyr! Else, a plyr and dplyr conflict.
-source (file.path ('functions', 'tools.R'))
+library (MoreTreeTools)
 library (dplyr)
 
 # PARAMETERS
@@ -32,8 +32,8 @@ cat ('\nDone.')
 
 # MANIPULATE
 cat ('\nManipulating data ....')
-# find appropriate sources, stick Source_ID and Study_number together
-x$SSID <- paste0(x$Source_ID, '_', x$Study_number)
+# make new study ID: stick Source_ID, Study_number and Class together
+x$SSID <- paste0 (x$Source_ID, '_', x$Study_number, '_', x$Class)
 # group
 sources <- group_by (x, SSID)
 # summarise
@@ -51,7 +51,6 @@ cat ('\nFiltering data ....')
 filtered <- filter (sources, P_sp_names >= non.sp.tol)
 filtered <- filter (filtered, P_sci_names >= non.sci.tol)
 filtered <- filter (filtered, N_names > 5)
-filtered <- filter (filtered, N_classes == 1)  # only 1 class
 if (reference.batch) {
   birds <- filter (filtered, Class_ex == 'Aves')
   bees <- filter (filtered, Order_ex == 'Hymenoptera')
