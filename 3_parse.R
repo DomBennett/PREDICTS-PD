@@ -25,7 +25,7 @@ for (i in 1:length (pub.trees)) {
   # ensure no node labels
   pub.trees[[i]]$node.label <- NULL
   if (!is.null (pub.trees[[i]]$edge.length) && is.ultrametric (pub.trees[[i]])) {
-    cat ('\n .... adding node ages')
+    cat ('\n ........ adding node ages')
     pub.trees[[i]]$node.ages <- getAge (tree=pub.trees[[i]])[ ,2]
   }
 }
