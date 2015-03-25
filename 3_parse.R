@@ -17,24 +17,29 @@ if (!file.exists (output.dir)) {
 }
 
 # INPUT
-cat ('\nReading trees for each study ....')
+cat ('\nReading published trees ....')
 pub.trees <- readInTrees (folder=file.path (data.dir, 'pub_phylos'))
 # add ages to pub trees to speed up mapNames
 for (i in 1:length (pub.trees)) {
-  if (!is.null (pub.trees[[i]]$edge.length) && is.ultrametric (pub.trees[[i]])) {
-    pub.trees[[i]]$node.ages <- getAge (tree=pub.trees[[i]])[ ,2]
-    # ensure no node labels
-    pub.trees[[i]]$node.label <- NULL
-  }
+  # ensure no node labels
+  pub.trees[[i]]$node.label <- NULL
+   if (!is.null (pub.trees[[i]]$edge.length) && is.ultrametric (pub.trees[[i]])) {
+     pub.trees[[i]]$node.ages <- getAge (tree=pub.trees[[i]])[ ,2]
+   }
 }
+cat('\nDone.')
 # create subject environment -- holds name resolutions of subject names
 # for mapNames. This will prevent searching same names multiple times
 sbjctenv <- new.env (parent=emptyenv ())
+cat ('\n Reading in pglt trees for each study ....')
 # counters
 pglt.counter <- pub.counter <- 0
 studies <- list.files (input.dir)
 trees <- list ()
-for (study in studies) {
+for (i in 1:length (studies)) {
+  cat ('\n.... study [', study, '], [', i, '/', length (studies), ']',
+       sep = '')
+  study <- studies[i]
   # init container
   study.tree <- list ()
   # pglt-trees
@@ -84,7 +89,9 @@ for (i in 1:length (trees)) {
   if (!is.null (mapped.trees)) {
     write.tree (file = file.path (folder.path, 'mapped.tre'), phy = mapped.trees)
   }
-  write.tree (file = file.path (folder.path, 'pglt.tre'), phy = pglt.trees)
+  if (!is.null (pglt.trees)) {
+    write.tree (file = file.path (folder.path, 'pglt.tre'), phy = pglt.trees)
+  }
 }
 cat ('Done. Discovered [', length (studies),
      '] studies of which [', pglt.counter,
