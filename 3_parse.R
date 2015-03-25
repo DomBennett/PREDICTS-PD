@@ -21,7 +21,7 @@ cat ('\nReading published trees ....')
 pub.trees <- readInTrees (folder=file.path (data.dir, 'pub_phylos'))
 # add ages to pub trees to speed up mapNames
 for (i in 1:length (pub.trees)) {
-  cat('\n .... [', names (pub.trees)[i], ']')
+  cat('\n .... [', names (pub.trees)[i], ']', sep='')
   # ensure no node labels
   pub.trees[[i]]$node.label <- NULL
   if (!is.null (pub.trees[[i]]$edge.length) && is.ultrametric (pub.trees[[i]])) {
@@ -55,10 +55,10 @@ for (i in 1:length (studies)) {
   names <- read.delim (file.path (input.dir, study, 'names.txt'), header=TRUE,
                        stringsAsFactors=FALSE)[ ,1]
   best.tree <- findBestRef (tip.labels=names, ref.trees=pub.trees)
-  if (!is.null (best.tree[[1]]) && !is.null (best.tree[[1]]$edge.length) && is.ultrametric (best.tree[[1]])) {
+  if (!is.null (best.tree[[1]])) {
     # generate a distribution of trees from random name mapping
     mapped.trees <- mapNames (tree=best.tree[[1]], names=names,
-                              iterations=1)
+                              iterations=100)
     if (!is.null (mapped.trees)) {
       study.tree['mapped.trees'] <- list (mapped.trees)
       pub.counter <- pub.counter + 1
@@ -76,8 +76,6 @@ cat ('\nRate-smoothing ....')
 smooth.counter <- 0
 # TODO: chronos or chrnonsML -- which is better?
 cat ('\nDone.')
-
-studies
 
 # OUTPUT
 cat ('\nWriting out ....')
