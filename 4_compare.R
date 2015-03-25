@@ -4,6 +4,7 @@
 
 # PARAMETERS
 min.tree <- 5  # minimum number of tips in a tree for reference
+iterations <- 10  # how many samples to be randomly taken from the distributions?
 
 # START
 cat (paste0 ('\nStage 4 started at [', Sys.time (), ']'))
@@ -20,37 +21,51 @@ if (!file.exists (output.dir)) {
 
 # INPUT
 cat ('\nReading in trees ....')
-# read in pub trees
-pub.trees <- readInTrees (folder = file.path (input.dirs[1], 'pub_phylos'))
-# read in pG-lt trees
-pglt.trees <- readInTrees (folder = input.dirs[2])
+# read in trees
+trees <- readInTrees (folder=input.dirs[2], recursive=TRUE)
+# read in pub trees again for reference
+pub.trees <- readInTrees (folder=file.path (input.dirs[1], 'pub_phylos'))
 cat ('\nDone.')
 
+# FILTER
+cat ('\nFiltering ....')
+keep <- NULL
+for (i in 1:length (trees)) {
+  if (length (trees[[i]]) > 1) {
+    keep <- append(keep, i)
+  }
+}
+trees <- trees[keep]
+cat ('\nDone')
+
 # PROCESS
-cat ('\nCalculating shared nodes ....')
-# calculate distances between pglt tree and the best pub tree
+cat ('\nCalculating tree distance metrics ....')
+# calculate distances between pglt and mapped trees
 ph85 <- score <- dmat <- ntaxa <- etaxa <- ref.trees <-
-  rep (NA, length (pglt.trees) * 100)
+  rep (NA, length (trees) * 100)
 c <- 1
-for (i in 1:length (pglt.trees)) {
-  cat ('\n.... tree [', i, '/', length (pglt.trees), ']', sep = '')
-  # get dist
-  treedist <- pglt.trees[[i]]
-  tip.labels <- getNames (treedist)
+for (i in 1:length (trees)) {
+  cat ('\n.... tree [', i, '/', length (trees), ']', sep = '')
+  # get dists
+  pglt.trees <- trees[[i]][['pglt']]
+  mapped.trees <- trees[[i]][['mapped']]
+  # find from whence the mapped trees came
+  tip.labels <- getNames (pglt.trees)
   # find best reference tree
-  ref.tree <- findBestRef (tip.labels, pub.trees)
-  ref.trees[c:(c + 99)] <- rep (names (ref.tree)[1], 100)
-  ref.tree <- ref.tree[[1]]
-  for (j in 1:length (treedist)) {
-    tree <- treedist[[j]]
-    shared.ntaxa <- sum (tree$tip.label %in% ref.tree$tip.label)
+  ref.tree <- names (findBestRef (tip.labels, pub.trees))[1]
+  ref.trees[c:(c + 99)] <- rep (ref.tree, 100)
+  for (j in 1:iterations) {
+    pglt.tree <- pglt.trees[[sample (1:length (pglt.trees), 1)]]
+    mapped.tree <- mapped.trees[[sample (1:length (mapped.trees), 1)]]
+    shared.ntaxa <- sum (duplicated (c (pglt.tree$tip.label,
+                                        mapped.tree$tip.label)))
     if (shared.ntaxa >= min.tree) {
-      res <- calcDist (tree, ref.tree)
+      res <- calcDist (pglt.tree, mapped.tree)
       ph85[c] <- res[['PH85']]
       score[c] <- res[['score']]
       dmat[c] <- res[['dmat']]
       ntaxa[c] <- shared.ntaxa
-      etaxa[c] <- getSize (tree) - shared.ntaxa
+      etaxa[c] <- getSize (pglt.tree) - shared.ntaxa
     }
     c <- c + 1
   }
@@ -109,7 +124,7 @@ ggScatter <- function (dist.metric, ylab) {
 # open filehandle
 pdf (file.path (output.dir, 'comparisons.pdf'))
 # make gg dataset and print boxplots
-study <- rep (1:length (pglt.trees), each = 100)
+study <- rep (1:length (trees), each = 100)
 plot.data <- data.frame (ph85, score, dmat, ntaxa, study,
                          Comparison_Tree = factor (ref.trees))
 ggBoxplot ('ph85', 'PH85 (P. Internal Branches)')
