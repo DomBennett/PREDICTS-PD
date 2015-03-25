@@ -5,6 +5,6 @@
 ## Process
 #source ('1_pGltsetup.R', eval = TRUE)
 #source ('2_pGltrun.R', eval = TRUE)
-source ('3_parse.R', eval = TRUE)
+source ('3_parse.R')
 #source ('4_compare.R', eval = TRUE)
-source ('5_analysis.R', eval = TRUE)
+source ('5_analysis.R')

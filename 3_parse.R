@@ -10,7 +10,7 @@ source (file.path ('tools', 'tree_tools.R'))
 
 # DIRS
 data.dir <- '0_data'
-input.dir <- '2_pGltRun'
+input.dir <- '2_pGltrun'
 output.dir <- '3_parse'
 if (!file.exists (output.dir)) {
   dir.create (output.dir)
@@ -23,9 +23,9 @@ pub.trees <- readInTrees (folder=file.path (data.dir, 'pub_phylos'))
 for (i in 1:length (pub.trees)) {
   # ensure no node labels
   pub.trees[[i]]$node.label <- NULL
-   if (!is.null (pub.trees[[i]]$edge.length) && is.ultrametric (pub.trees[[i]])) {
-     pub.trees[[i]]$node.ages <- getAge (tree=pub.trees[[i]])[ ,2]
-   }
+  if (!is.null (pub.trees[[i]]$edge.length) && is.ultrametric (pub.trees[[i]])) {
+    pub.trees[[i]]$node.ages <- getAge (tree=pub.trees[[i]])[ ,2]
+  }
 }
 cat('\nDone.')
 # create subject environment -- holds name resolutions of subject names
@@ -37,9 +37,9 @@ pglt.counter <- pub.counter <- 0
 studies <- list.files (input.dir)
 trees <- list ()
 for (i in 1:length (studies)) {
+  study <- studies[i]
   cat ('\n.... study [', study, '], [', i, '/', length (studies), ']',
        sep = '')
-  study <- studies[i]
   # init container
   study.tree <- list ()
   # pglt-trees
