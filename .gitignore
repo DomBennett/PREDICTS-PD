@@ -6,9 +6,11 @@
 0_data/
 1_pGltsetup/
 2_pGltrun/
-3_parse/
-4_compare/
-5_metrics/
+3_map/
+4_parse/
+5_compare/
+6_metrics/
+7_analysis/
 temp/
 *-BATCH/
 log.txt
