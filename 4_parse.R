@@ -6,7 +6,7 @@
 cat (paste0 ('\nStage 4 started at [', Sys.time (), ']'))
 
 # LIBS
-source (file.path ('tools', 'tree_tools.R'))
+library (ape)
 
 # DIRS
 data.dir <- '0_data'
