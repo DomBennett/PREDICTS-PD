@@ -49,8 +49,11 @@ for (i in 1:length (studies)) {
   if (!is.null (best.tree[[1]])) {
     cat ('\n........ mapping')
     # generate a distribution of trees from random name mapping
-    mapped.trees <- mapNames (tree=best.tree[[1]], names=names,
-                              iterations=100)
+    mapped.trees <- NULL
+    try ({
+      mapped.trees <- mapNames (tree=best.tree[[1]], names=names,
+                                iterations=1)
+    }, silent=TRUE)
     if (!is.null (mapped.trees)) {
       cat ('\n........ outputting')
       filename <- paste0 (file.path (output.dir, study), '.tre')
