@@ -24,10 +24,8 @@ for (i in 1:length (pub.trees)) {
   cat('\n .... [', names (pub.trees)[i], ']', sep='')
   # ensure no node labels
   pub.trees[[i]]$node.label <- NULL
-  if (!is.null (pub.trees[[i]]$edge.length) && is.ultrametric (pub.trees[[i]])) {
-    cat ('\n ........ adding node ages')
-    pub.trees[[i]]$node.ages <- getAge (tree=pub.trees[[i]])[ ,2]
-  }
+  cat ('\n ........ adding node ages')
+  pub.trees[[i]]$node.ages <- getAge (tree=pub.trees[[i]])[ ,2]
 }
 cat('\nDone.')
 # create subject environment -- holds name resolutions of subject names
@@ -52,7 +50,7 @@ for (i in 1:length (studies)) {
     mapped.trees <- NULL
     try ({
       mapped.trees <- mapNames (tree=best.tree[[1]], names=names,
-                                iterations=1)
+                                iterations=100)
     }, silent=TRUE)
     if (!is.null (mapped.trees)) {
       cat ('\n........ outputting')
