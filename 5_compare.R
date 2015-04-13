@@ -13,8 +13,8 @@ cat (paste0 ('\nStage 4 started at [', Sys.time (), ']'))
 source (file.path ('tools', 'tree_tools.R'))
 
 # DIRS
-input.dirs <- c ('0_data', '3_parse')
-output.dir <- '4_compare'
+input.dirs <- c ('0_data', '4_parse')
+output.dir <- '5_compare'
 if (!file.exists (output.dir)) {
   dir.create (output.dir)
 }
@@ -48,7 +48,7 @@ for (i in 1:length (trees)) {
   cat ('\n.... tree [', i, '/', length (trees), ']', sep = '')
   # get dists
   pglt.trees <- trees[[i]][['pglt']]
-  mapped.trees <- trees[[i]][['mapped']]
+  mapped.trees <- list (trees[[i]][['mapped']])  # TODO: change this Dom!
   # find from whence the mapped trees came
   tip.labels <- getNames (pglt.trees)
   # find best reference tree
