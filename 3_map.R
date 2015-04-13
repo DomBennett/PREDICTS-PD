@@ -18,15 +18,22 @@ if (!file.exists (output.dir)) {
 
 # INPUT
 cat ('\nReading published trees ....')
+# read, parse and add ages to pub trees
 pub.trees <- readInTrees (folder=file.path (data.dir, 'pub_phylos'))
-# add ages to pub trees to speed up mapNames
+skip <- NULL
 for (i in 1:length (pub.trees)) {
   cat('\n .... [', names (pub.trees)[i], ']', sep='')
   # ensure no node labels
   pub.trees[[i]]$node.label <- NULL
-  cat ('\n ........ adding node ages')
-  pub.trees[[i]]$node.ages <- getAge (tree=pub.trees[[i]])[ ,2]
+  if (is.null (pub.trees[[i]]$edge.length)) {
+    cat ('\n ........ no edge lengths -- ignoring')
+    skip <- c (skip, i)
+  } else {
+    cat ('\n ........ adding node ages')
+    pub.trees[[i]]$node.ages <- getAge (tree=pub.trees[[i]])[ ,2]
+  }
 }
+pub.trees <- pub.trees[-skip]
 cat('\nDone.')
 # create subject environment -- holds name resolutions of subject names
 # for mapNames. This will prevent searching same names multiple times
