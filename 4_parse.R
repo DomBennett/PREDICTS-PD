@@ -21,7 +21,7 @@ if (!file.exists (output.dir)) {
 cat ('\n Reading in pglt and mapped trees for each study ....')
 # counters
 pglt.counter <- map.counter <- 0
-studies <- list.files (pglt.dir)  # this should really be 1_pGltsetup
+studies <- list.files ('1_pGltsetup')
 trees <- list ()
 for (i in 1:length (studies)) {
   study <- studies[i]
