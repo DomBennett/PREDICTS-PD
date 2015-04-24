@@ -29,7 +29,7 @@ sh setup.R
 ```
 
 Note, stage 3 and the setup script will take a long time to run as they interact
-with the (GNR)[http://resolver.globalnames.biodinfo.org/].
+with the [GNR](http://resolver.globalnames.biodinfo.org/).
 
 ## Directory structure
 
