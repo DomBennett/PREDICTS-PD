@@ -24,7 +24,7 @@ cat ('\nReading in trees ....')
 # read in trees
 trees <- readInTrees (folder=input.dirs[2], recursive=TRUE)
 # read in pub trees again for reference
-pub.trees <- readInTrees (folder=file.path (input.dirs[1], 'pub_phylos'))
+pub.trees <- readInTrees (folder=file.path (input.dirs[1], 'parsed_trees'))
 cat ('\nDone.')
 
 # FILTER

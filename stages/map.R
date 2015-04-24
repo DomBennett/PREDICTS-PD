@@ -10,6 +10,7 @@ source (file.path ('tools', 'tree_tools.R'))
 
 # DIRS
 data.dir <- '0_data'
+tree.dir <- file.path (data.dir, 'parsed_trees')
 input.dir <- '1_pGltsetup'
 output.dir <- '3_map'
 if (!file.exists (output.dir)) {
@@ -19,7 +20,7 @@ if (!file.exists (output.dir)) {
 # INPUT
 cat ('\nReading published trees ....')
 # read, parse and add ages to pub trees
-pub.trees <- readInTrees (folder=file.path (data.dir, 'pub_phylos'))
+pub.trees <- readInTrees (folder=tree.dir)
 skip <- NULL
 for (i in 1:length (pub.trees)) {
   cat('\n .... [', names (pub.trees)[i], ']', sep='')
@@ -35,9 +36,8 @@ for (i in 1:length (pub.trees)) {
 }
 pub.trees <- pub.trees[-skip]
 cat('\nDone.')
-# create subject environment -- holds name resolutions of subject names
-# for mapNames. This will prevent searching same names multiple times
-sbjctenv <- new.env (parent=emptyenv ())
+# read in preresolved names
+load (file.path (tree.dir, 'preresolved.RData'))
 cat ('\nMapping names to published trees and outputting for each study ....')
 # counter and nnames
 counter <- nnames <- 0
@@ -57,7 +57,7 @@ for (i in 1:length (studies)) {
     mapped.trees <- NULL
     try ({
       mapped.trees <- mapNames (tree=best.tree[[1]], names=names,
-                                iterations=100)
+                                iterations=100, resolve.list=resolve.list)
     }, silent=TRUE)
     if (!is.null (mapped.trees)) {
       cat ('\n........ outputting')

@@ -16,7 +16,7 @@ non.sp.tol <- 0.5  # the maximum proportion of names resolved above the species 
 non.sci.tol <- 0.5  # the maximum proportion of non-scientific names
 
 # DIRS
-input.dir <- '0_data'
+input.dir <- file.path ('0_data', 'PREDICTS-DATA')
 output.dir <- '1_pGltsetup'
 if (!file.exists (output.dir)) {
   dir.create (output.dir)
