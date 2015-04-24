@@ -48,11 +48,15 @@ for (i in 1:length (trees)) {
   cat ('\n.... tree [', i, '/', length (trees), ']', sep = '')
   # get dists
   pglt.trees <- trees[[i]][['pglt']]
-  mapped.trees <- list (trees[[i]][['mapped']])  # TODO: change this Dom!
+  mapped.trees <- trees[[i]][['mapped']]
   # find from whence the mapped trees came
   tip.labels <- getNames (pglt.trees)
   # find best reference tree
   ref.tree <- names (findBestRef (tip.labels, pub.trees))[1]
+  # quick check that ref.tree is returned
+  if (is.null (ref.tree)) {
+    next
+  }
   ref.trees[c:(c + 99)] <- rep (ref.tree, 100)
   for (j in 1:iterations) {
     pglt.tree <- pglt.trees[[sample (1:length (pglt.trees), 1)]]
