@@ -16,4 +16,4 @@
 7_analysis/
 temp/
 *-BATCH/
-log.txt
+*log*
