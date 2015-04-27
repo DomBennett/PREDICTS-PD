@@ -13,9 +13,11 @@ input.dir <- file.path ('0_data', 'raw_trees')
 output.dir <- file.path ('0_data', 'parsed_trees')
 
 # PROCESS
+cat('\nReading in trees ....')
 treefiles <- list.files (input.dir, pattern = '.tre')
 trees <- list ()
 for (i in 1:length (treefiles)) {
+  cat ('\n........ working on [', i, '/', length (treefiles), ']', sep='')
   tree <- read.tree (file.path (input.dir, treefiles[i]))
   if (class (tree) == 'multiPhylo') {
     # if multiphylo, select a random 100
@@ -25,6 +27,7 @@ for (i in 1:length (treefiles)) {
   # add to list
   trees[treefiles[i]] <- list (tree)
 }
+cat('\nDone.')
 
 # RATE-SMOOTH
 # TODO
