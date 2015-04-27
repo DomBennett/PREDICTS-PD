@@ -55,3 +55,10 @@ plot.fixed.effects <- function(model, main, sub = I(formula(model))){
     text(i-1, max.y, effect.names$level[i], srt=90, adj=1,col="gray", cex=cex)
   }
 }
+
+plotLegend <- function (groups) {
+  par (xpd=TRUE)  # plot outside margin
+  legend (c(0, -2), legend=unique (groups), pch = 19,
+          col=rainbow(length(unique (groups))), bty='n')
+  par (xpd=FALSE)  # reset
+}
