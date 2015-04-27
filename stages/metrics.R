@@ -3,7 +3,7 @@
 # Calculate phylo metrics per site
 
 # START
-cat (paste0 ('\nStage 6 started at [', Sys.time (), ']'))
+cat (paste0 ('\nStage 6 started at [', Sys.time (), ']\n'))
 
 # LIBS
 source (file.path ('tools', 'tree_tools.R'))
@@ -69,20 +69,30 @@ for (i in 1:length (trees)) {
   # TODO: is there a better way of doing this?
   #  This is something I don't like about R
   site.counts <- table (study.data$Site_number)
-  study.data$pglt_mean_PD <-
-    rep (phymets.res$pglt$PD1_mean, site.counts)
-  study.data$pglt_sd_PD <-
-    rep (phymets.res$pglt$PD1_sd, site.counts)
-  study.data$pglt_mean_PSV <-
-    rep (phymets.res$pglt$PSV_mean, site.counts)
-  study.data$pglt_sd_PSV <-
-    rep (phymets.res$pglt$PSV_sd, site.counts)
-  study.data$pglt_mean_PSE <-
-    rep (phymets.res$pglt$PSE_mean, site.counts)
-  study.data$pglt_sd_PSE <-
-    rep (phymets.res$pglt$PSE_sd, site.counts)
-  study.data$pglt_pdropped <-
+  if ('pglt' %in% names (phymets.res)) {
+    study.data$pglt_mean_PD <-
+      rep (phymets.res$pglt$PD1_mean, site.counts)
+    study.data$pglt_sd_PD <-
+      rep (phymets.res$pglt$PD1_sd, site.counts)
+    study.data$pglt_mean_PSV <-
+      rep (phymets.res$pglt$PSV_mean, site.counts)
+    study.data$pglt_sd_PSV <-
+      rep (phymets.res$pglt$PSV_sd, site.counts)
+    study.data$pglt_mean_PSE <-
+      rep (phymets.res$pglt$PSE_mean, site.counts)
+    study.data$pglt_sd_PSE <-
+      rep (phymets.res$pglt$PSE_sd, site.counts)
+    study.data$pglt_pdropped <-
       phymets.res$pglt$pdropped
+  } else {
+    study.data$pglt_mean_PD <- rep (NA, nrow (study.data))
+    study.data$pglt_sd_PD <- rep (NA, nrow (study.data))
+    study.data$pglt_mean_PSV <- rep (NA, nrow (study.data))
+    study.data$pglt_sd_PSV <- rep (NA, nrow (study.data))
+    study.data$pglt_mean_PSE <- rep (NA, nrow (study.data))
+    study.data$pglt_sd_PSE <- rep (NA, nrow (study.data))
+    study.data$pglt_pdropped <- rep (NA, nrow (study.data))
+  }
   if ('mapped' %in% names (phymets.res)) {
     study.data$mapped_mean_PD <-
       rep (phymets.res$mapped$PD1_mean, site.counts)
