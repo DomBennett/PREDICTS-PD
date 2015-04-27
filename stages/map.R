@@ -21,20 +21,11 @@ if (!file.exists (output.dir)) {
 cat ('\nReading published trees ....')
 # read, parse and add ages to pub trees
 pub.trees <- readInTrees (folder=tree.dir)
-skip <- NULL
 for (i in 1:length (pub.trees)) {
   cat('\n .... [', names (pub.trees)[i], ']', sep='')
-  # ensure no node labels
-  pub.trees[[i]]$node.label <- NULL
-  if (is.null (pub.trees[[i]]$edge.length)) {
-    cat ('\n ........ no edge lengths -- ignoring')
-    skip <- c (skip, i)
-  } else {
-    cat ('\n ........ adding node ages')
-    pub.trees[[i]]$node.ages <- getAge (tree=pub.trees[[i]])[ ,2]
-  }
+  cat ('\n ........ adding node ages')
+  pub.trees[[i]] <- addAges (phylos=pub.trees[[i]])
 }
-pub.trees <- pub.trees[-skip]
 cat('\nDone.')
 # read in preresolved names
 load (file.path (tree.dir, 'preresolved.RData'))
