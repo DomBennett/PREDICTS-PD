@@ -7,7 +7,7 @@ min.tree <- 5  # minimum number of tips in a tree for reference
 iterations <- 10  # how many samples to be randomly taken from the distributions?
 
 # START
-cat (paste0 ('\nStage 4 started at [', Sys.time (), ']'))
+cat (paste0 ('\nStage 5 started at [', Sys.time (), ']\n'))
 
 # LIBS
 source (file.path ('tools', 'tree_tools.R'))

@@ -3,7 +3,7 @@
 # Map PREDICTS names onto published trees
 
 # START
-cat (paste0 ('\nStage 3 started at [', Sys.time (), ']'))
+cat (paste0 ('\nStage 3 started at [', Sys.time (), ']\n'))
 
 # LIBS
 source (file.path ('tools', 'tree_tools.R'))

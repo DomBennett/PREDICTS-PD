@@ -2,6 +2,9 @@
 # Team PREDICTS-PD
 # Resolve ALL names in published trees and PREDICTS data
 
+# START
+cat (paste0 ('\nSetup pre-resolve started at [', Sys.time (), ']\n'))
+
 # LIBRARY
 source (file.path ('tools', 'tree_tools.R'))
 
@@ -41,3 +44,6 @@ cat ('\nDone.')
 # SAVE
 outfile <- file.path (output.dir, 'preresolved.RData')
 save (resolve.list, file=outfile)
+
+# FINISH
+cat (paste0 ('\nFinished at [', Sys.time (), ']'))

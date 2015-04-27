@@ -2,6 +2,9 @@
 # Team PREDICTS-PD
 # Read in raw trees, rate-smooth and output
 
+# START
+cat (paste0 ('\nSetup parse started at [', Sys.time (), ']\n'))
+
 # LIBS
 library (ape)
 
@@ -32,3 +35,6 @@ for (i in 1:length (trees)) {
   outfile <- file.path (output.dir, names (trees)[i])
   write.tree (phy=trees[[1]], file=outfile)
 }
+
+# FINISH
+cat (paste0 ('\nFinished at [', Sys.time (), ']'))
