@@ -128,4 +128,4 @@ cat ('\nDone. Calculated PD estimates for [',
 saveRDS (res, file=file.path(output.dir, 'predictsdata_wpd.rds'))
 
 # FINISH
-cat (paste0 ('\nStage 5 finished at [', Sys.time (), ']'))
+cat (paste0 ('\nStage 6 finished at [', Sys.time (), ']'))
