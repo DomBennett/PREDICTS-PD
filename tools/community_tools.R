@@ -14,6 +14,8 @@ getCommunityMatrix <- function (study.data) {
   pull <- names (molten.data) %in% c ('Site_number', 'Parsed_name', 'variable', 'value')
   molten.data <- molten.data[ ,pull]
   cmatrix <- cast (molten.data, Site_number ~ Parsed_name, mean)
+  # replace any missing values with 0
+  cmatrix[is.na (cmatrix)] <- 0
   rownames (cmatrix) <- cmatrix[ ,1]
   cmatrix[ ,-1]
 }
