@@ -5,6 +5,9 @@
 # START
 cat (paste0 ('\nStage 4 started at [', Sys.time (), ']'))
 
+# PARAMETERS
+use.unconstrained <- FALSE
+
 # LIBS
 library (ape)
 
@@ -30,7 +33,11 @@ for (i in 1:length (studies)) {
   # init container
   study.tree <- list ()
   # pglt-trees
-  fpath <- file.path (pglt.dir, study, '4_phylogeny', 'distribution.tre')
+  if (use.unconstrained) {
+    fpath <- file.path (pglt.dir, study, '4_phylogeny', 'distribution_unconstrained.tre')
+  } else {
+    fpath <- file.path (pglt.dir, study, '4_phylogeny', 'distribution.tre')
+  }
   pglt.trees <- suppressWarnings (try (read.tree (fpath), silent = TRUE))
   if (class (pglt.trees) != 'try-error') {
     study.tree['pglt.trees'] <- list (pglt.trees)
