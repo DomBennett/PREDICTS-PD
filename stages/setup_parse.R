@@ -18,11 +18,10 @@ trees <- list ()
 for (i in 1:length (treefiles)) {
   tree <- read.tree (file.path (input.dir, treefiles[i]))
   if (class (tree) == 'multiPhylo') {
-    random <- sample (1:length (tree), 1)
-    tree <- tree[[random]]
+    # if multiphylo, select a random 100
+    random <- sample (1:length (tree), 100)
+    tree <- tree[random]
   }
-  # remove node labels
-  tree$node.label <- NULL
   # add to list
   trees[treefiles[i]] <- list (tree)
 }
@@ -33,7 +32,7 @@ for (i in 1:length (treefiles)) {
 # WRITE OUT
 for (i in 1:length (trees)) {
   outfile <- file.path (output.dir, names (trees)[i])
-  write.tree (phy=trees[[1]], file=outfile)
+  write.tree (phy=trees[[i]], file=outfile)
 }
 
 # FINISH
