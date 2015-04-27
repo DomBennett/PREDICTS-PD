@@ -14,7 +14,9 @@
 5_compare/
 6_metrics/
 7_analysis/
+7_commplots/
 temp/
 *-BATCH/
 *log*
 backups/
+*.tar.gz
