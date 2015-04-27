@@ -53,7 +53,12 @@ findBestRef <- function (tip.labels, ref.trees) {
   # find the best reference tree based on given tip.labels
   ptips <- rep (NA, length (ref.trees))
   for (i in 1:length (ref.trees)) {
-    ptips[i] <- sum (ref.trees[[i]]$tip.label %in% tip.labels)/length (tip.labels)
+    if (class (ref.trees[[i]]) == 'multiPhylo') {
+      ref.tree <- ref.trees[[i]][[1]]
+    } else {
+      ref.tree <- ref.trees[[i]]
+    }
+    ptips[i] <- sum (ref.tree$tip.label %in% tip.labels)/length (tip.labels)
   }
   if (any (ptips > 0)) {
     besti <- which (ptips == max (ptips))[1]
@@ -70,4 +75,19 @@ getNames <- function(phylos) {
   res <- NULL
   m_ply (.data=data.frame (i=1:length (phylos)), .fun=.get)
   unique (res)
+}
+
+addAges <- function(phylos) {
+  # take phylo or multiPhylo and add new slot for ages of nodes
+  addAges <- function (i) {
+    phylos[[i]]$node.ages <- getAge (tree=phylos[[i]])[ ,2]
+    phylos <<- phylos
+  }
+  if (class (phylos) == 'multiPhylo') {
+    m_ply (.data = data.frame (i=1:length (phylos)),
+           .fun=addAges)
+  } else {
+    phylos$node.ages <- getAge (tree=phylos)[ ,2]
+  }
+  return (phylos)
 }
