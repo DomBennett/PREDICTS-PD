@@ -1,7 +1,7 @@
 .Rproj.user
 .Rhistory
 .RData
-.Rproj
+*.Rproj
 
 # data files
 0_data/
@@ -17,3 +17,4 @@
 temp/
 *-BATCH/
 *log*
+backups/
