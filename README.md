@@ -18,8 +18,9 @@ To run pipeline (UNIX OS):
 sh run.sh
 ```
 
-This will only run stages 1, 3, 4, 5 and 6. Stage 2 can only be run on a HPC
-using pG-lt. Stage 7 requires human interaction.
+This will only run stages 1, 3, 4, 5, 6 and 7. Stage 2 can only be run on a HPC
+using [pG-lt](https://github.com/DomBennett/pG-lt). Stage 8 requires human
+interaction.
 
 The pipeline requires published trees to have been parsed and placed in
 `0_data/parsed_trees/`. If they are not, the setup scripts will need to be run:
@@ -31,7 +32,27 @@ sh setup.R
 Note, stage 3 and the setup script will take a long time to run as they interact
 with the [GNR](http://resolver.globalnames.biodinfo.org/).
 
-## Directory structure
+## Setup-stages
+
+1. `setup_presolve.R`: read in published trees and PREDICTS data, search names
+against [GNR](http://resolver.globalnames.biodinfo.org/).
+2. `setup_parse.R`: read in published trees and rate-smooth
+
+## Stages
+
+1. `pGltsetup.R`: identify suitable PREDICTS studies, output into pG-lt friendly
+format
+2. `pGltrun.R`: placeholder script -- doesn't do anything
+3. `map.R`: use published phylogenies in `0_data` to generate study-level
+phylogenies
+4. `parse.R`: read in pG-lt and mapped phylogenies, check and rate-smooth
+5. `compare.R`: compare mapped and pG-lt phylogenies
+6. `metrics.R`: generate PD, PSV and PSE values per site using both pG-lt and
+mapped trees.
+7. `commplots.R`: community plot PREDICTS data onto pG-lt consensus phylogenies
+8. `analysis.R`: analysis script used to analyse phylogeny ~ human disturbance
+
+## Directory structure after run
 
 ```
 -- 0_data/
@@ -53,7 +74,9 @@ with the [GNR](http://resolver.globalnames.biodinfo.org/).
     -- [results from comparing mapped and pG-lt trees]
 -- 6_metrics/
     -- [site-level PREDICTS data with phylogenetic metrics]
--- 7_analysis/
+-- 7_commplots/
+    -- [plots of trees with species incidences and abundances per site]
+-- 8_analysis/
     -- [results from human disturbance ~ phylogenetic metrics]
 -- stages/
     -- [all R stages files]
