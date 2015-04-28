@@ -20,3 +20,4 @@ temp/
 *log*
 backups/
 *.tar.gz
+*.zip
