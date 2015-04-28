@@ -8,6 +8,7 @@ cat (paste0 ('\nStage 7 started at [', Sys.time (), ']\n'))
 # LIBS
 source (file.path ('tools', 'tree_tools.R'))
 source (file.path ('tools', 'community_tools.R'))
+source (file.path ('tools', 'plotting_tools.R'))
 
 # DIRS
 predicts.dir <- file.path ('0_data', 'PREDICTS-DATA')
