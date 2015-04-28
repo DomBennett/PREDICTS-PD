@@ -3,7 +3,7 @@
 # How does PD respond to human impacts?
 
 # START
-cat (paste0 ('\nStage 6 started at [', Sys.time (), ']'))
+cat (paste0 ('\nStage 8 started at [', Sys.time (), ']'))
 
 # LIBS
 library(lme4)
@@ -12,8 +12,8 @@ library (multcomp)
 source (file.path ('tools', 'plotting_tools.R'))
 
 # DIRS
-input.dir <- '5_metrics'
-output.dir <- '6_analysis'
+input.dir <- '6_metrics'
+output.dir <- '8_analysis'
 if (!file.exists (output.dir)) {
   dir.create (output.dir)
 }
