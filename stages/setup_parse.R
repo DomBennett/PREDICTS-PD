@@ -6,7 +6,7 @@
 cat (paste0 ('\nSetup parse started at [', Sys.time (), ']\n'))
 
 # LIBS
-library (ape)
+source (file.path ('tools', 'tree_tools.R'))
 
 # DIRS
 input.dir <- file.path ('0_data', 'raw_trees')
@@ -37,6 +37,16 @@ for (i in 1:length (trees)) {
   outfile <- file.path (output.dir, names (trees)[i])
   write.tree (phy=trees[[i]], file=outfile)
 }
+
+# WRITE OUT W/ AGES
+cat ('\n Adding node ages ....')
+for (i in 1:length (trees)) {
+  cat('\n .... [', names (trees)[i], ']', sep='')
+  trees[[i]] <- addAges (phylos=trees[[i]])
+}
+trees <- pub.trees
+save (pub.trees, file=file.path (outpur.dir, 'trees_with_ages.RData'))
+cat('\nDone.')
 
 # FINISH
 cat (paste0 ('\nFinished at [', Sys.time (), ']'))

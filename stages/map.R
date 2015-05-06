@@ -19,14 +19,8 @@ if (!file.exists (output.dir)) {
 
 # INPUT
 cat ('\nReading published trees ....')
-# read, parse and add ages to pub trees
-pub.trees <- readInTrees (folder=tree.dir)
-for (i in 1:length (pub.trees)) {
-  cat('\n .... [', names (pub.trees)[i], ']', sep='')
-  cat ('\n ........ adding node ages')
-  pub.trees[[i]] <- addAges (phylos=pub.trees[[i]])
-}
-cat('\nDone.')
+# read in parsed and aged pub trees
+load (file.path (tree.dir, 'trees_with_ages.RData'))
 # read in preresolved names
 load (file.path (tree.dir, 'preresolved.RData'))
 cat ('\nMapping names to published trees and outputting for each study ....')
