@@ -44,7 +44,7 @@ for (i in 1:length (trees)) {
   cat('\n .... [', names (trees)[i], ']', sep='')
   trees[[i]] <- addAges (phylos=trees[[i]])
 }
-trees <- pub.trees
+pub.trees <- trees
 save (pub.trees, file=file.path (outpur.dir, 'trees_with_ages.RData'))
 cat('\nDone.')
 
