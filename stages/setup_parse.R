@@ -30,7 +30,11 @@ for (i in 1:length (treefiles)) {
 cat('\nDone.')
 
 # RATE-SMOOTH
-# TODO
+cat ('\nRate-smoothing where needed ....')
+for (i in 1:length (trees)) {
+  trees[[i]] <- runChronos (trees[[i]])
+}
+cat ('\nDone.')
 
 # WRITE OUT
 for (i in 1:length (trees)) {

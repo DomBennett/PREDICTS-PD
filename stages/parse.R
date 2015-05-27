@@ -9,7 +9,7 @@ cat (paste0 ('\nStage 4 started at [', Sys.time (), ']'))
 use.unconstrained <- FALSE
 
 # LIBS
-library (ape)
+source (file.path ('tools', 'tree_tools.R'))
 
 # DIRS
 data.dir <- '0_data'
@@ -40,6 +40,8 @@ for (i in 1:length (studies)) {
   }
   pglt.trees <- suppressWarnings (try (read.tree (fpath), silent = TRUE))
   if (class (pglt.trees) != 'try-error') {
+    cat ('\n.... attempting to rate-smooth')
+    pglt.trees <- runChronos (pglt.trees)
     study.tree['pglt.trees'] <- list (pglt.trees)
     pglt.counter <- pglt.counter + 1
   }
@@ -55,12 +57,6 @@ for (i in 1:length (studies)) {
     trees[study] <- list (study.tree)
   }
 }
-cat ('\nDone.')
-
-# MAKE ULTRAMETRIC
-cat ('\nRate-smoothing ....')
-smooth.counter <- 0
-# TODO: chronos or chrnonsML -- which is better?
 cat ('\nDone.')
 
 # OUTPUT
@@ -82,8 +78,7 @@ for (i in 1:length (trees)) {
 cat ('Done. Discovered [', length (studies),
      '] studies of which [', pglt.counter,
      '] had pglt distirbutions and [', map.counter ,
-     '] had had mapped distributions and [',
-     smooth.counter, '] were rate-smoothed.', sep='')
+     '] had mapped distributions', sep='')
 
 # FINISH
 cat (paste0 ('\nStage 4 finished at [', Sys.time (), ']'))

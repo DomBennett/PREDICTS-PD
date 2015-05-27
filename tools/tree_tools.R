@@ -6,6 +6,34 @@
 library (MoreTreeTools)
 
 # FUNCTIONS
+runChronos <- function (trees) {
+  # run chronos over multiple trees
+  .run <- function (i) {
+    tree <- safeChronos (trees[[i]])
+    new.list <<- c (new.trees, list (tree))
+  }
+  if (class (trees) == 'multiPhylo') {
+    new.trees <- list ()
+    m_ply (.data=data.frame(i=1:length(trees)), .fun=.run)
+    class (new.trees) <- 'multiPhylo'
+    return (new.trees)
+  } else {
+    return (safeChronos (trees))
+  }
+}
+
+safeChronos <- function (tree) {
+  ## Wrapper for chronoMPL to handle unexpected errors
+  ## see -- https://stat.ethz.ch/pipermail/r-sig-phylo/2014-April/003416.html
+  if (!is.ultrametric (tree)) {
+    temp <- try (chronoMPL (tree), silent = TRUE)
+    if (any (class (temp) == 'phylo')) {
+      tree <- temp
+    }
+  }
+  tree
+}
+
 readInTrees <- function (folder, recursive=FALSE) {
   # point at a folder, it will return a list of trees in that folder
   all.trees <- list ()
