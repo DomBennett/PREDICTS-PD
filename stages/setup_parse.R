@@ -38,8 +38,10 @@ cat ('\nDone.')
 
 # WRITE OUT
 for (i in 1:length (trees)) {
-  outfile <- file.path (output.dir, names (trees)[i])
-  write.tree (phy=trees[[i]], file=outfile)
+  if (length (trees[[i]]) > 1) {
+    outfile <- file.path (output.dir, names (trees)[i])
+    write.tree (phy=trees[[i]], file=outfile)
+  }
 }
 
 # WRITE OUT W/ AGES
