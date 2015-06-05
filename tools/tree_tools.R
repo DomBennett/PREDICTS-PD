@@ -25,8 +25,8 @@ runChronos <- function (trees) {
 safeChronos <- function (tree) {
   ## Wrapper for chronoMPL to handle unexpected errors
   ## see -- https://stat.ethz.ch/pipermail/r-sig-phylo/2014-April/003416.html
-  if (!is.ultrametric (tree)) {
-    temp <- try (chronoMPL (tree), silent = TRUE)
+  if (!is.ultrametric (tree, tol = 0.001)) {
+    temp <- try (chronos (tree), silent = TRUE)
     if (any (class (temp) == 'phylo')) {
       tree <- temp
     }
