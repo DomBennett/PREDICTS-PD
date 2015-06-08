@@ -33,6 +33,9 @@ cat ('\nDone.')
 # PROCESS
 cat ('\nCalculating PD estimates ....')
 study.counter <- 0
+ntaxa <- list ('predicts'=rep (NA, length (trees)),
+               'mapped'=rep (NA, length (trees)),
+               'pglt'=rep (NA, length (trees)))
 res <- data.frame ()
 for (i in 1:length (trees)) {
   # progress
@@ -43,6 +46,7 @@ for (i in 1:length (trees)) {
   study.data  <- predicts.data[predicts.data$SSID == study, ]
   # extract community matrix, necessary for commPD
   cmatrix <- getCommunityMatrix(study.data)
+  ntaxa[['predicts']][i] <- ncol (cmatrix)
   # calculate stats for each set of trees
   phymets.res <- list ()
   for (j in 1:length (trees[[i]])) {
@@ -51,6 +55,7 @@ for (i in 1:length (trees)) {
     phymets.res[[prefix]] <- list ()
     # estimate spp dropped
     tip.labels <- getNames (treedist)
+    ntaxa[[prefix]][i] <- length (tip.labels)
     pdropped <- sum (!colnames (cmatrix) %in% tip.labels)/
       ncol(cmatrix)
     phymets.res[[prefix]][['pdropped']] <- pdropped
@@ -121,8 +126,25 @@ for (i in 1:length (trees)) {
   res <- rbind (res, study.data)
   study.counter <- study.counter + 1
 }
+mean.pglt.ntaxa <- mean (ntaxa[['pglt']], na.rm=TRUE)
+mean.mapped.ntaxa <- mean (ntaxa[['mapped']], na.rm=TRUE)
+ntaxa.predicts <- sum (ntaxa[['predicts']], na.rm=TRUE)
+ntaxa.mapped <- sum (ntaxa[['mapped']], na.rm=TRUE)
+ntaxa.pglt <- sum (ntaxa[['pglt']], na.rm=TRUE)
+pdf (file.path(output.dir, 'names.pdf'))
+barplot (c (ntaxa.pglt, ntaxa.mapped, ntaxa.predicts),
+         names.arg=c ('pG-lt', 'Mapped', 'PREDICTS'),
+         col=rainbow(3), ylab='N names')
+barplot (c (mean.pglt.ntaxa, mean.mapped.ntaxa),
+         names.arg=c ('pG-lt', 'Mapped'),
+         col=rainbow(2), ylab='Mean N names per study')
+dev.off ()
 cat ('\nDone. Calculated PD estimates for [',
-     study.counter, '] studies.', sep='')
+     study.counter, '] studies. Found [', ntaxa.predicts,
+     '] names of which [', ntaxa.pglt,
+     '] were represented in pglt trees and [', ntaxa.mapped,
+     '] were represented in mapped trees with mean [', mean.pglt.ntaxa,
+     '] and [', mean.mapped.ntaxa, '] number of taxa per study, respectively.',  sep='')
 
 # OUTPUT
 saveRDS (res, file=file.path(output.dir, 'predictsdata_wpd.rds'))
