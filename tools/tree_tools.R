@@ -10,7 +10,7 @@ runChronos <- function (trees) {
   # run chronos over multiple trees
   .run <- function (i) {
     tree <- safeChronos (trees[[i]])
-    new.list <<- c (new.trees, list (tree))
+    new.trees <<- c (new.trees, list (tree))
   }
   if (class (trees) == 'multiPhylo') {
     new.trees <- list ()
