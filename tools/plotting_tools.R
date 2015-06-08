@@ -58,7 +58,9 @@ plot.fixed.effects <- function(model, main, sub = I(formula(model))){
 
 plotLegend <- function (groups) {
   par (xpd=TRUE)  # plot outside margin
+  n <- length(unique(groups))
+  hs <- seq.int(0, 1 + max(1, n - 1)/n, length.out = n)%%1
   legend (c(0, -2), legend=unique (groups), pch = 19,
-          col=rainbow(length(unique (groups))), bty='n')
+          col=hsv(hs), bty='n')
   par (xpd=FALSE)  # reset
 }
