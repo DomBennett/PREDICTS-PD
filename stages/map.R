@@ -21,6 +21,12 @@ if (!file.exists (output.dir)) {
 cat ('\nReading published trees ....')
 # read in parsed and aged pub trees
 load (file.path (tree.dir, 'trees_with_ages.RData'))
+for (i in 1:length (pub.trees)) {
+  if ('chronos' %in% class (pub.trees[[i]])) {
+    class (pub.trees[[i]]) <- 'phylo'
+  }
+  pub.trees[[i]] <- dropUnderscore (pub.trees[[i]])
+}
 # read in preresolved names
 load (file.path (tree.dir, 'preresolved.RData'))
 cat ('\nMapping names to published trees and outputting for each study ....')
@@ -44,7 +50,7 @@ for (i in 1:length (studies)) {
       mapped.trees <- mapNames (tree=best.tree[[1]], names=names,
                                 iterations=100, resolve.list=resolve.list)
     }, silent=TRUE)
-    if (!is.null (mapped.trees)) {
+    if (!is.null (mapped.trees) & !is.na (mapped.trees[[1]])) {
       cat ('\n........ outputting')
       filename <- paste0 (file.path (output.dir, study), '.tre')
       write.tree (file=filename, phy=mapped.trees)
