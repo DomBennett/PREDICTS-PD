@@ -8,8 +8,14 @@ cat (paste0 ('\nStage 4 started at [', Sys.time (), ']'))
 # PARAMETERS
 use.unconstrained <- FALSE
 
-# LIBS
+# LIBS (UNIX ONLY)
+library (foreach)
+library (doMC)
 source (file.path ('tools', 'tree_tools.R'))
+
+# PARAMETERS
+ncpus <- 8
+registerDoMC (ncpus)
 
 # DIRS
 data.dir <- '0_data'
@@ -22,11 +28,10 @@ if (!file.exists (output.dir)) {
 
 # INPUT
 cat ('\n Reading in pglt and mapped trees for each study ....')
-# counters
-pglt.counter <- map.counter <- 0
 studies <- list.files ('1_pGltsetup')
 trees <- list ()
-for (i in 1:length (studies)) {
+counter <- foreach (i=1:length (studies)) %dopar% {
+  counter <- NULL  # record p or m
   study <- studies[i]
   cat ('\n.... study [', study, '], [', i, '/', length (studies), ']',
        sep = '')
@@ -43,19 +48,20 @@ for (i in 1:length (studies)) {
     cat ('\n.... attempting to rate-smooth')
     pglt.trees <- runChronos (pglt.trees)
     study.tree['pglt.trees'] <- list (pglt.trees)
-    pglt.counter <- pglt.counter + 1
+    counter <- c (counter, 'p')
   }
   # mapped trees
   fpath <- file.path (mapped.dir, paste0 (study, '.tre'))
   mapped.trees <- suppressWarnings (try (read.tree (fpath), silent = TRUE))
   if (class (mapped.trees) != 'try-error') {
     study.tree['mapped.trees'] <- list (mapped.trees)
-    map.counter <- map.counter + 1
+    counter <- c (counter, 'm')
   }
   if (length (study.tree) > 0) {
     # add study container to all container
     trees[study] <- list (study.tree)
   }
+  counter
 }
 cat ('\nDone.')
 
@@ -75,6 +81,9 @@ for (i in 1:length (trees)) {
     write.tree (file = file.path (folder.path, 'pglt.tre'), phy = pglt.trees)
   }
 }
+counter <- table (unlist (counter))
+pglt.counter <- ifelse (is.na (counter['p']), 0, counter['p'])
+map.counter <- ifelse (is.na (counter['m']), 0, counter['m'])
 cat ('Done. Discovered [', length (studies),
      '] studies of which [', pglt.counter,
      '] had pglt distirbutions and [', map.counter ,
