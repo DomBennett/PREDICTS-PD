@@ -5,8 +5,14 @@
 # START
 cat (paste0 ('\nStage 3 started at [', Sys.time (), ']\n'))
 
-# LIBS
+# LIBS (UNIX ONLY)
+library (foreach)
+library (doMC)
 source (file.path ('tools', 'tree_tools.R'))
+
+# PARAMETERS
+ncpus <- 8
+registerDoMC (ncpus)
 
 # DIRS
 data.dir <- '0_data'
@@ -30,10 +36,9 @@ for (i in 1:length (pub.trees)) {
 # read in preresolved names
 load (file.path (tree.dir, 'preresolved.RData'))
 cat ('\nMapping names to published trees and outputting for each study ....')
-# counter and nnames
-counter <- nnames <- 0
 studies <- list.files (input.dir)
-for (i in 1:length (studies)) {
+counter <- foreach (i=1:length (studies)) %dopar% {
+  counter <- NULL  # record m and n
   study <- studies[i]
   cat ('\n.... study [', study, '], [', i, '/', length (studies), ']',
        sep = '')
@@ -54,16 +59,19 @@ for (i in 1:length (studies)) {
       cat ('\n........ outputting')
       filename <- paste0 (file.path (output.dir, study), '.tre')
       write.tree (file=filename, phy=mapped.trees)
-      counter <- counter + 1
-      nnames <- nnames + length (names)
+      counter <- c (counter, 'm', rep ('n', length (names)))
     }
   }
+  counter
 }
 cat ('\nDone.')
 
 # OUTPUT
-cat ('Done. Identified [', length (studies), '] studies of which [', counter,
-     '] had names mapped to published trees representing a total [', nnames ,
+counter <- table (unlist (counter))
+map.counter <- ifelse (is.na (counter['m']), 0, counter['m'])
+names.counter <- ifelse (is.na (counter['n']), 0, counter['n'])
+cat ('Done. Identified [', length (studies), '] studies of which [', map.counter,
+     '] had names mapped to published trees representing a total [', names.counter ,
      '] names.', sep='')
 
 # FINISH
