@@ -4,6 +4,20 @@ All code is made available for reproducing the analyses as described in
 [insert paper URL here]. Certain datasets have not been made available due to
 their large size.
 
+## Data
+
+Completed stage folders not provided. Download `data_files.tar.gz` [here](https://drive.google.com/drive/u/0/folders/0B9T4fm0FZKiDfnZWaWVuYnNVRDdlNUZDblQxYy1kX09nQkM4YmlhU0FlX2xwTVcwR2NJanM). Uncompress files:
+
+```{bash}
+sh uncompress.sh
+```
+
+And compress again:
+
+```{bash}
+sh compress.sh
+```
+
 ## Running
 
 Make sure all relevant packages are installed:
