@@ -22,7 +22,7 @@ if (!file.exists (output.dir)) {
 # INPUT
 cat ('\nReading in trees ....')
 # read in trees
-trees <- readInTrees (folder=input.dirs[2], recursive=TRUE)
+trees <- readInTrees (folder=input.dirs[2], recursive=TRUE)[1:10]
 # read in pub trees again for reference
 pub.trees <- readInTrees (folder=file.path (input.dirs[1], 'parsed_trees'))
 cat ('\nDone.')
@@ -41,7 +41,7 @@ cat ('\nDone')
 # PROCESS
 cat ('\nCalculating tree distance metrics ....')
 # calculate distances between pglt and mapped trees
-ph85 <- score <- dmat <- ntaxa <- etaxa <- ref.trees <-
+ph85 <- score <- dmat <- ntaxa <- ref.trees <-
   rep (NA, length (trees) * 100)
 c <- 1
 for (i in 1:length (trees)) {
@@ -69,7 +69,6 @@ for (i in 1:length (trees)) {
       score[c] <- res[['score']]
       dmat[c] <- res[['dmat']]
       ntaxa[c] <- shared.ntaxa
-      etaxa[c] <- getSize (pglt.tree) - shared.ntaxa
     }
     c <- c + 1
   }
@@ -80,13 +79,10 @@ p.score.mean <- mean (score, na.rm = TRUE)
 p.score.sd <- sd (score, na.rm = TRUE)
 p.dmat.mean <- mean (dmat, na.rm = TRUE)
 p.dmat.sd <- sd (dmat, na.rm = TRUE)
-p.etaxa.mean <- mean (etaxa / (ntaxa + etaxa), na.rm = TRUE)
-p.etaxa.sd <- sd (etaxa / (ntaxa + etaxa), na.rm = TRUE)
 cat ('\nDone....')
 cat ('[', p.ph85.mean, '±', p.ph85.sd, '] PH85', sep='')
 cat ('[', p.score.mean, '±', p.score.sd, '] score', sep='')
 cat ('[', p.dmat.mean, '±', p.dmat.sd, '] dmat', sep='')
-cat ('[', p.etaxa.mean, '±', p.etaxa.sd, '] extra taxa in pG-lt trees', sep='')
 
 # OUTPUT
 cat ('\nPlotting and summarising ....')

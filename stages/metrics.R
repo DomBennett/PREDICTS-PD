@@ -126,25 +126,24 @@ for (i in 1:length (trees)) {
   res <- rbind (res, study.data)
   study.counter <- study.counter + 1
 }
-mean.pglt.ntaxa <- mean (ntaxa[['pglt']], na.rm=TRUE)
-mean.mapped.ntaxa <- mean (ntaxa[['mapped']], na.rm=TRUE)
 ntaxa.predicts <- sum (ntaxa[['predicts']], na.rm=TRUE)
 ntaxa.mapped <- sum (ntaxa[['mapped']], na.rm=TRUE)
 ntaxa.pglt <- sum (ntaxa[['pglt']], na.rm=TRUE)
-pdf (file.path(output.dir, 'names.pdf'))
-barplot (c (ntaxa.pglt, ntaxa.mapped, ntaxa.predicts),
-         names.arg=c ('pG-lt', 'Mapped', 'PREDICTS'),
-         col=rainbow(3), ylab='N names')
-barplot (c (mean.pglt.ntaxa, mean.mapped.ntaxa),
-         names.arg=c ('pG-lt', 'Mapped'),
-         col=rainbow(2), ylab='Mean N names per study')
-dev.off ()
+pglt.more <- sum (ntaxa$pglt - ntaxa$mapped, na.rm=TRUE)
+pglt.more.p <- mean (ntaxa$pglt/ntaxa$mapped, na.rm=TRUE)
+# work out total names between both
+pglt.pull <- ntaxa$pglt > ntaxa$mapped
+pglt.pull[is.na (pglt.pull)] <- FALSE
+pglt.pull[is.na(ntaxa$mapped)] <- TRUE
+tot.taxa <- sum (c (ntaxa$pglt[pglt.pull], ntaxa$mapped[!pglt.pull]))
 cat ('\nDone. Calculated PD estimates for [',
      study.counter, '] studies. Found [', ntaxa.predicts,
-     '] names of which [', ntaxa.pglt,
+     '] PREDICTS names of which [', ntaxa.pglt,
      '] were represented in pglt trees and [', ntaxa.mapped,
-     '] were represented in mapped trees with mean [', mean.pglt.ntaxa,
-     '] and [', mean.mapped.ntaxa, '] number of taxa per study, respectively.',  sep='')
+     '] were represented in mapped trees.
+     For studies that shared both mapped and pglt trees there were [', pglt.more,
+     '] more in pglt trees, represeneting [', pglt.more.p, 'x] more names on average.
+     In total, a max [', tot.taxa, '] names is repsented by both.',  sep='')
 
 # OUTPUT
 saveRDS (res, file=file.path(output.dir, 'predictsdata_wpd.rds'))
