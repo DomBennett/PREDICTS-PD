@@ -9,6 +9,9 @@ cat (paste0 ('\nStage 6 started at [', Sys.time (), ']\n'))
 source (file.path ('tools', 'tree_tools.R'))
 source (file.path ('tools', 'community_tools.R'))
 
+# PARAMETERS
+normalise <- 'age'  # how to normalise the branch lengths (age, total, none)
+
 # DIRS
 input.dirs <- c ('0_data', '4_parse')
 predicts.dir <- file.path ('0_data', 'PREDICTS-DATA')
@@ -62,7 +65,7 @@ for (i in 1:length (trees)) {
     # calc phylogenetic metrics per site for all trees in dist
     for (metric in c( 'PD1', 'PSV', 'PSE')) {
       multi <- multiCommPhyMets (trees=treedist, cmatrix=cmatrix,
-                                 metric=metric)
+                                 metric=metric, normalise=normalise)
       # get mean and sd per site
       phymets.res[[prefix]][[paste0 (metric, '_mean')]] <-
         apply (multi, 2, mean, na.rm =TRUE)

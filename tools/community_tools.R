@@ -20,15 +20,26 @@ getCommunityMatrix <- function (study.data) {
   cmatrix[ ,-1]
 }
 
-multiCommPhyMets <- function(trees, cmatrix, metric) {
+multiCommPhyMets <- function(trees, cmatrix, metric,
+                             normalise=c ('age', 'total', 'none')) {
   # Wrapper for commPD that works with multiphylos
   .calc <- function(i) {
     tree <- trees[[i]]
-    # normalise edge lengths to sum to 1
-    tree$edge.length <- tree$edge.length/sum (tree$edge.length)
+    if (normalise == 'age') {
+      # normlaise RTT
+      tree$edge.length <- tree$edge.length / getSize (tree, 'rtt')
+    } else if (normalise == 'total') {
+      # normalise edge lengths to sum to 1
+      tree$edge.length <- tree$edge.length/sum (tree$edge.length)
+    } else if (normalise == 'none') {
+      # do nothing
+    } else {
+      stop ('Unknown normalise arg')
+    }
     # drop names not in community matrix
     cmatrix <- cmatrix[ ,colnames (cmatrix) %in% tree$tip.label]
     t (calcComPhyMets (cmatrix=cmatrix, tree=tree, metrics=c (metric))[ ,2])
   }
+  normalise <- match.arg (normalise)
   mdply (.data=data.frame(i=1:length (trees)), .fun=.calc)[ ,-1]
 }
