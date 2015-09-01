@@ -5,16 +5,27 @@
 # PARAMETERS
 min.tree <- 5  # minimum number of tips in a tree for reference
 iterations <- 10  # how many samples to be randomly taken from the distributions?
+#use.unconstrained <- FALSE
 
 # START
-cat (paste0 ('\nStage 5 started at [', Sys.time (), ']\n'))
+if (use.unconstrained) {
+  cat (paste0 ('\nStage 5 (unconstrained) started at [', Sys.time (), ']\n'))
+} else {
+  cat (paste0 ('\nStage 5 started at [', Sys.time (), ']\n'))
+}
 
 # LIBS
 source (file.path ('tools', 'tree_tools.R'))
 
 # DIRS
-input.dirs <- c ('0_data', '4_parse')
-output.dir <- '5_compare'
+data.dir <- '0_data'
+if (use.unconstrained) {
+  input.dir <- '4_parse_unconstrained'
+  output.dir <- '5_compare_unconstrained'
+} else {
+  input.dir <- '4_parse'
+  output.dir <- '5_compare'
+}
 if (!file.exists (output.dir)) {
   dir.create (output.dir)
 }
@@ -22,13 +33,14 @@ if (!file.exists (output.dir)) {
 # INPUT
 cat ('\nReading in trees ....')
 # read in trees
-trees <- readInTrees (folder=input.dirs[2], recursive=TRUE)
+trees <- readInTrees (folder=input.dir, recursive=TRUE)
 # read in pub trees again for reference
-pub.trees <- readInTrees (folder=file.path (input.dirs[1], 'parsed_trees'))
+pub.trees <- readInTrees (folder=file.path (data.dir, 'parsed_trees'))
 cat ('\nDone.')
 
 # FILTER
 cat ('\nFiltering ....')
+trees.copy <- trees
 keep <- NULL
 for (i in 1:length (trees)) {
   if (length (trees[[i]]) > 1) {
@@ -43,7 +55,7 @@ cat ('\nCalculating tree distance metrics ....')
 # calculate distances between pglt and mapped trees
 ph85 <- score <- dmat <- ntaxa <- ref.trees <-
   rep (NA, length (trees) * 100)
-c <- 1
+count <- 1
 for (i in 1:length (trees)) {
   cat ('\n.... tree [', i, '/', length (trees), ']', sep = '')
   # get dists
@@ -57,7 +69,7 @@ for (i in 1:length (trees)) {
   if (is.null (ref.tree)) {
     next
   }
-  ref.trees[c:(c + 99)] <- rep (ref.tree, 100)
+  ref.trees[count:(count + 99)] <- rep (ref.tree, 100)
   for (j in 1:iterations) {
     pglt.tree <- pglt.trees[[sample (1:length (pglt.trees), 1)]]
     mapped.tree <- mapped.trees[[sample (1:length (mapped.trees), 1)]]
@@ -65,12 +77,12 @@ for (i in 1:length (trees)) {
                                         mapped.tree$tip.label)))
     if (shared.ntaxa >= min.tree) {
       res <- calcDist (pglt.tree, mapped.tree)
-      ph85[c] <- res[['PH85']]
-      score[c] <- res[['score']]
-      dmat[c] <- res[['dmat']]
-      ntaxa[c] <- shared.ntaxa
+      ph85[count] <- res[['PH85']]
+      score[count] <- res[['score']]
+      dmat[count] <- res[['dmat']]
+      ntaxa[count] <- shared.ntaxa
     }
-    c <- c + 1
+    count <- count + 1
   }
 }
 p.ph85.mean <- mean (ph85, na.rm = TRUE)
