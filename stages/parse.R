@@ -3,10 +3,14 @@
 # Parse published and pG-lt trees
 
 # START
-cat (paste0 ('\nStage 4 started at [', Sys.time (), ']'))
+if (use.unconstrained) {
+  cat (paste0 ('\nStage 4 (unconstrained) started at [', Sys.time (), ']'))
+} else {
+  cat (paste0 ('\nStage 4 started at [', Sys.time (), ']'))
+}
 
 # PARAMETERS
-use.unconstrained <- FALSE
+#use.unconstrained <- FALSE
 
 # LIBS (UNIX ONLY)
 library (foreach)
@@ -29,7 +33,11 @@ registerDoMC (ncpus)
 data.dir <- '0_data'
 pglt.dir <- '2_pGltrun'
 mapped.dir <- '3_map'
-output.dir <- '4_parse'
+if (use.unconstrained) {
+  output.dir <- '4_parse_unconstrained'
+} else {
+  output.dir <- '4_parse'
+}
 if (!file.exists (output.dir)) {
   dir.create (output.dir)
 }
