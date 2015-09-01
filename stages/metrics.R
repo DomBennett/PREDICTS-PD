@@ -10,7 +10,7 @@ source (file.path ('tools', 'tree_tools.R'))
 source (file.path ('tools', 'community_tools.R'))
 
 # PARAMETERS
-normalise <- 'age'  # how to normalise the branch lengths (age, total, none)
+#normalise <- 'age'  # how to normalise the branch lengths (age, total, none)
 
 # DIRS
 input.dirs <- c ('0_data', '4_parse')
@@ -132,6 +132,8 @@ for (i in 1:length (trees)) {
 ntaxa.predicts <- sum (ntaxa[['predicts']], na.rm=TRUE)
 ntaxa.mapped <- sum (ntaxa[['mapped']], na.rm=TRUE)
 ntaxa.pglt <- sum (ntaxa[['pglt']], na.rm=TRUE)
+pp.pglt <-mean (ntaxa[['pglt']]*100/ntaxa[['predicts']], na.rm=TRUE)
+pp.mapped <-mean (ntaxa[['mapped']]*100/ntaxa[['predicts']], na.rm=TRUE)
 pglt.more <- sum (ntaxa$pglt - ntaxa$mapped, na.rm=TRUE)
 pglt.more.p <- mean (ntaxa$pglt/ntaxa$mapped, na.rm=TRUE)
 # work out total names between both
@@ -146,10 +148,13 @@ cat ('\nDone. Calculated PD estimates for [',
      '] were represented in mapped trees.
      For studies that shared both mapped and pglt trees there were [', pglt.more,
      '] more in pglt trees, represeneting [', pglt.more.p, 'x] more names on average.
+     Mean [', pp.pglt, '%] of study names in studies for pglt trees.
+     Mean [', pp.mapped, '%] of study names in studies for mapped trees.
      In total, a max [', tot.taxa, '] names is repsented by both.',  sep='')
 
 # OUTPUT
-saveRDS (res, file=file.path(output.dir, 'predictsdata_wpd.rds'))
+outfile <- paste0 ('predictsdata_wpd_', normalise, '.rds')
+saveRDS (res, file=file.path(output.dir, outfile))
 
 # FINISH
 cat (paste0 ('\nStage 6 finished at [', Sys.time (), ']'))
