@@ -26,7 +26,6 @@ writeTree <- function (tree, filename, folder.path) {
 }
 
 # PARAMETERS
-ncpus <- 8
 registerDoMC (ncpus)
 
 # DIRS
@@ -63,7 +62,7 @@ counter <- foreach (i=1:length (studies)) %dopar% {
   pglt.trees <- suppressWarnings (try (read.tree (fpath), silent = TRUE))
   if (class (pglt.trees) != 'try-error') {
     cat ('\n.... attempting to rate-smooth')
-    pglt.trees <- runChronos (pglt.trees)
+    pglt.trees <- runRateSmoother (pglt.trees)
     writeTree (pglt.trees, 'pglt.tre', folder.path)
     counter <- c (counter, 'p')
   }
