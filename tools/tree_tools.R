@@ -6,10 +6,10 @@
 library (MoreTreeTools)
 
 # FUNCTIONS
-runRateSmoother <- function (trees) {
+runRateSmoother <- function (trees, i) {
   # run chronos over multiple trees
   .run <- function (i) {
-    tree <- pathD8 (trees[[i]])
+    tree <- pathD8 (trees[[i]], i)
     new.trees <<- c (new.trees, list (tree))
   }
   if (class (trees) == 'multiPhylo') {
@@ -18,17 +18,20 @@ runRateSmoother <- function (trees) {
     class (new.trees) <- 'multiPhylo'
     return (new.trees)
   } else {
-    return (pathD8 (trees))
+    return (pathD8 (trees), i)
   }
 }
 
-pathD8 <- function (tree) {
+pathD8 <- function (tree, i=1) {
   # Run pathd8 from system path
-  write.tree (tree, 'temp_pathd8_input.tre')
-  system ('./PATHd8 temp_pathd8_input.tre temp_pathd8_output.tre',
+  # Use i to give unique name (optional)
+  infile <- paste0 ('temp_pathd8_', i, '_in.tre')
+  outfile <- paste0 ('temp_pathd8_', i, '_out.tre')
+  write.tree (tree, infile)
+  system (paste0 ('./PATHd8 ', infile, ' ', outfile),
           ignore.stdout=TRUE)
-  tree <- read.tree ('temp_pathd8_output.tre')
-  system ('rm temp_pathd8_input.tre temp_pathd8_output.tre')
+  tree <- read.tree (outfile)
+  system (paste0 ('rm ', infile, ' ', outfile))
   tree[[1]]  # use d8 tree
 }
 
