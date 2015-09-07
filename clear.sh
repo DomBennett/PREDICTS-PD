@@ -4,4 +4,4 @@
 # remove log files
 rm *_log.txt
 # remove folders 1, 3-7
-rm -r [1,3-7]*
+rm -r [1,4-7]*
