@@ -3,6 +3,7 @@
 # Run pipeline (e.g. RScript run.R > run_log.txt 2>&1)
 
 # Parameters
+ncpus <- 8
 parameters <- list ('normalise'=c ('age', 'total'),
                     'use.unconstrained'=c (TRUE, FALSE))
 
