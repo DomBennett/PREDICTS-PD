@@ -25,7 +25,8 @@ runRateSmoother <- function (trees) {
 pathD8 <- function (tree) {
   # Run pathd8 from system path
   write.tree (tree, 'temp_pathd8_input.tre')
-  system ('./PATHd8 temp_pathd8_input.tre temp_pathd8_output.tre')
+  system ('./PATHd8 temp_pathd8_input.tre temp_pathd8_output.tre',
+          ignore.stdout=TRUE)
   tree <- read.tree ('temp_pathd8_output.tre')
   system ('rm temp_pathd8_input.tre temp_pathd8_output.tre')
   tree[[1]]  # use d8 tree
