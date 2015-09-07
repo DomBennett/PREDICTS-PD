@@ -6,10 +6,10 @@
 library (MoreTreeTools)
 
 # FUNCTIONS
-runChronos <- function (trees) {
+runRateSmoother <- function (trees) {
   # run chronos over multiple trees
   .run <- function (i) {
-    tree <- safeChronos (trees[[i]])
+    tree <- pathD8 (trees[[i]])
     new.trees <<- c (new.trees, list (tree))
   }
   if (class (trees) == 'multiPhylo') {
@@ -18,9 +18,19 @@ runChronos <- function (trees) {
     class (new.trees) <- 'multiPhylo'
     return (new.trees)
   } else {
-    return (safeChronos (trees))
+    return (pathD8 (trees))
   }
 }
+
+pathD8 <- function (tree) {
+  # Run pathd8 from system path
+  write.tree (tree, 'temp_pathd8_input.tre')
+  system ('./PATHd8 temp_pathd8_input.tre temp_pathd8_output.tre')
+  tree <- read.tree ('temp_pathd8_output.tre')
+  system ('rm temp_pathd8_input.tre temp_pathd8_output.tre')
+  tree[[1]]  # use d8 tree
+}
+
 
 safeChronos <- function (tree) {
   ## Wrapper for chronos to handle unexpected errors
@@ -30,6 +40,16 @@ safeChronos <- function (tree) {
     if (any (class (temp) == 'phylo')) {
       tree <- temp
     }
+  }
+  tree
+}
+
+safeChronoMPL <- function (tree) {
+  ## Wrapper for chronoMPL to handle unexpected errors
+  ## see -- https://stat.ethz.ch/pipermail/r-sig-phylo/2014-April/003416.html
+  temp <- try (chronoMPL (tree), silent = TRUE)
+  if (any (class (temp) == 'phylo')) {
+    tree <- temp
   }
   tree
 }
