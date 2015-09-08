@@ -18,7 +18,7 @@ runRateSmoother <- function (trees, i) {
     class (new.trees) <- 'multiPhylo'
     return (new.trees)
   } else {
-    return (pathD8 (trees))
+    return (pathD8 (trees, i))
   }
 }
 
