@@ -1,7 +1,12 @@
 # 01/11/2014
 # Team PREDICTS-PD
 # Run calculate
-# Usage: RScript run.R
+# Usage: RScript x_calculate.R
+
+# Check pglt res
+if (!file.exists ('0_pglt')) {
+  stop ('No 0_pglt/ found')
+}
 
 # Parameters
 ncpus <- 8
@@ -10,15 +15,14 @@ normalise.vec <- c ('age', 'total')
 
 # Pipeline
 cat ('\nRunning pipeline ....')
-source ('stages/pGltsetup.R', print.eval=TRUE, local=TRUE)
 # loop through compare stages with constrained and unconstrained
 for (use.unconstrained in use.unconstrained.vec) {
-  source ('stages/parse.R', print.eval=TRUE, local=TRUE)
-  source ('stages/compare.R', print.eval=TRUE, local=TRUE)
+  source ('stages/B1_parse.R', print.eval=TRUE, local=TRUE)
+  source ('stages/B2_compare.R', print.eval=TRUE, local=TRUE)
 }
 # loop metrics for the two ways of normalising branch lengths
 for (normalise in normalise.vec) {
-  source ('stages/metrics.R', print.eval=TRUE, local=TRUE)
+  source ('stages/B3_metrics.R', print.eval=TRUE, local=TRUE)
 }
-source ('stages/commplots.R', print.eval=TRUE, local=TRUE)
+source ('stages/B4_plots.R', print.eval=TRUE, local=TRUE)
 cat ('\nComplete....')

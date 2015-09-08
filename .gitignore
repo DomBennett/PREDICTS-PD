@@ -4,22 +4,10 @@
 *.Rproj
 
 # data files
-0_data/
-1_pGltsetup/
-2_pGltrun/
-2_pGltrun_backup/
-3_map/
-3_map_backup/
-4_parse/
-5_compare/
-6_metrics/
-7_analysis/
-7_commplots/
-temp/
-*-BATCH/
+A*
+B*
+0*
 *log*
-backups/
 *.tar.gz
 *.zip
-*_unconstrained
 PATHd8
