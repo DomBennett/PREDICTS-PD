@@ -5,6 +5,6 @@
 # Usage: sh run.sh &
 
 echo 'Running pipeline'
-sh setup.sh > setup_log.txt 2>&1 &
-Rscript calculate.R > calculate_log.txt 2>&1 &
+sh setup.sh > setup_log.txt 2>&1
+Rscript calculate.R > calculate_log.txt 2>&1
 echo 'Complete'
