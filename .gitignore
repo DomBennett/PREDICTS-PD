@@ -4,8 +4,9 @@
 *.Rproj
 
 # data files
-A*
-B*
+A*/
+B*/
+C*/
 0*
 *log*
 *.tar.gz
