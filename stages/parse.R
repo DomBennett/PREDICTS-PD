@@ -4,9 +4,9 @@
 
 # START
 if (use.unconstrained) {
-  cat (paste0 ('\nStage 4 (unconstrained) started at [', Sys.time (), ']'))
+  cat (paste0 ('\nParse (unconstrained) started at [', Sys.time (), ']'))
 } else {
-  cat (paste0 ('\nStage 4 started at [', Sys.time (), ']'))
+  cat (paste0 ('\nParse started at [', Sys.time (), ']'))
 }
 
 # PARAMETERS

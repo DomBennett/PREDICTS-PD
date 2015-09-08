@@ -3,7 +3,7 @@
 # Plot communities by site
 
 # START
-cat (paste0 ('\nStage 7 started at [', Sys.time (), ']\n'))
+cat (paste0 ('\nCommplots started at [', Sys.time (), ']\n'))
 
 # LIBS
 source (file.path ('tools', 'tree_tools.R'))

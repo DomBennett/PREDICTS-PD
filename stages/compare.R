@@ -9,9 +9,9 @@ iterations <- 10  # how many samples to be randomly taken from the distributions
 
 # START
 if (use.unconstrained) {
-  cat (paste0 ('\nStage 5 (unconstrained) started at [', Sys.time (), ']\n'))
+  cat (paste0 ('\nCompare (unconstrained) started at [', Sys.time (), ']\n'))
 } else {
-  cat (paste0 ('\nStage 5 started at [', Sys.time (), ']\n'))
+  cat (paste0 ('\nCompare started at [', Sys.time (), ']\n'))
 }
 
 # LIBS

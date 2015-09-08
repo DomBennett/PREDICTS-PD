@@ -3,7 +3,7 @@
 # Resolve ALL names in published trees and PREDICTS data
 
 # START
-cat (paste0 ('\nSetup pre-resolve started at [', Sys.time (), ']\n'))
+cat (paste0 ('\nPre-resolve started at [', Sys.time (), ']\n'))
 
 # LIBRARY
 source (file.path ('tools', 'tree_tools.R'))

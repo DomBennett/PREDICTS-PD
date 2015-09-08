@@ -3,7 +3,7 @@
 # How does PD respond to human impacts?
 
 # START
-cat (paste0 ('\nStage 8 started at [', Sys.time (), ']'))
+cat (paste0 ('\nAnalysis started at [', Sys.time (), ']'))
 
 # LIBS
 library(lme4)

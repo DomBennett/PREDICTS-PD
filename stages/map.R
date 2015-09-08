@@ -3,7 +3,7 @@
 # Map PREDICTS names onto published trees
 
 # START
-cat (paste0 ('\nStage 3 started at [', Sys.time (), ']\n'))
+cat (paste0 ('\nMap started at [', Sys.time (), ']\n'))
 
 # LIBS (UNIX ONLY)
 library (foreach)

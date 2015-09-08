@@ -3,7 +3,7 @@
 # Create setup files for pG-lt
 
 # START
-cat (paste0 ('\nStage 1 started at [', Sys.time (), ']'))
+cat (paste0 ('\npG-lt setup started at [', Sys.time (), ']'))
 
 # LIBS
 # source before dplyr! Else, a plyr and dplyr conflict.

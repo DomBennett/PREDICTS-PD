@@ -3,7 +3,7 @@
 # Calculate phylo metrics per site
 
 # START
-cat (paste0 ('\nStage 6 started at [', Sys.time (), ']\n'))
+cat (paste0 ('\nMetrics started at [', Sys.time (), ']\n'))
 
 # LIBS
 source (file.path ('tools', 'tree_tools.R'))

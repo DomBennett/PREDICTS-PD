@@ -3,7 +3,7 @@
 # Read in raw trees, rate-smooth and output
 
 # START
-cat (paste0 ('\nSetup parse started at [', Sys.time (), ']\n'))
+cat (paste0 ('\nPub parse started at [', Sys.time (), ']\n'))
 
 # LIBS
 source (file.path ('tools', 'tree_tools.R'))
