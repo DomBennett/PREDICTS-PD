@@ -23,16 +23,19 @@ runRateSmoother <- function (trees, i) {
 }
 
 pathD8 <- function (tree, i=1) {
-  # Run pathd8 from system path
-  # Use i to give unique name (optional)
-  infile <- paste0 ('temp_pathd8_', i, '_in.tre')
-  outfile <- paste0 ('temp_pathd8_', i, '_out.tre')
-  write.tree (tree, infile)
-  system (paste0 ('./PATHd8 ', infile, ' ', outfile),
-          ignore.stdout=TRUE)
-  tree <- read.tree (outfile)
-  system (paste0 ('rm ', infile, ' ', outfile))
-  tree[[1]]  # use d8 tree
+  if (!is.ultrametric (tree)) {
+    # Run pathd8 from system path
+    # Use i to give unique name (optional)
+    infile <- paste0 ('temp_pathd8_', i, '_in.tre')
+    outfile <- paste0 ('temp_pathd8_', i, '_out.tre')
+    write.tree (tree, infile)
+    system (paste0 ('./PATHd8 ', infile, ' ', outfile),
+            ignore.stdout=TRUE)
+    tree <- read.tree (outfile)
+    system (paste0 ('rm ', infile, ' ', outfile))
+    tree <- tree[[1]]  # use d8 tree
+  }
+  tree
 }
 
 
