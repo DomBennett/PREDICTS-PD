@@ -27,8 +27,6 @@ pathD8 <- function (tree, i=1) {
   # Use i to give unique name (optional)
   infile <- paste0 ('temp_pathd8_', i, '_in.tre')
   outfile <- paste0 ('temp_pathd8_', i, '_out.tre')
-  print (infile)
-  print (outfile)
   write.tree (tree, infile)
   system (paste0 ('./PATHd8 ', infile, ' ', outfile),
           ignore.stdout=TRUE)

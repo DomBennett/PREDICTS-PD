@@ -1,6 +1,7 @@
 # 01/11/2014
 # Team PREDICTS-PD
-# Run pipeline (e.g. RScript run.R > run_log.txt 2>&1)
+# Run calculate
+# Usage: RScript run.R
 
 # Parameters
 ncpus <- 8

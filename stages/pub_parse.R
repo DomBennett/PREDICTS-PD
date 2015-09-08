@@ -32,7 +32,7 @@ cat('\nDone.')
 # RATE-SMOOTH
 cat ('\nRate-smoothing where needed ....')
 for (i in 1:length (trees)) {
-  trees[[i]] <- runChronos (trees[[i]])
+  trees[[i]] <- runRateSmoother (trees[[i]])
 }
 cat ('\nDone.')
 
