@@ -16,7 +16,7 @@ registerDoMC (ncpus)
 
 # DIRS
 resolve.dir <- 'A1_preresolved'
-parsed.dir <- 'A2_parsed'
+parsed.dir <- 'A2_parse'
 pglt.dir <- 'A3_pgltsetup'
 output.dir <- 'A4_map'
 if (!file.exists (output.dir)) {
