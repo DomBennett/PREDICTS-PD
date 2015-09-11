@@ -13,7 +13,7 @@ source (file.path ('tools', 'community_tools.R'))
 #normalise <- 'age'  # how to normalise the branch lengths (age, total, none)
 
 # DIRS
-parse.dir <- 'B1_parse.R'
+parse.dir <- 'B1_parse'
 predicts.dir <- file.path ('0_data', 'PREDICTS-DATA')
 output.dir <- 'B3_metrics'
 if (!file.exists (output.dir)) {

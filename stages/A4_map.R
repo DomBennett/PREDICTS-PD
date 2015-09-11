@@ -15,7 +15,7 @@ ncpus <- 8
 registerDoMC (ncpus)
 
 # DIRS
-resolve.dir <- 'A1_preresolved'
+resolve.dir <- 'A1_preresolve'
 parsed.dir <- 'A2_parse'
 pglt.dir <- 'A3_pgltsetup'
 output.dir <- 'A4_map'
