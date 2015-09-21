@@ -8,7 +8,7 @@ here (not yet available).
 
 The analysis comes in four stages:
 
-![r_pipeline](https://raw.githubusercontent.com/DomBennett/PREDICTS-PD/master/other/r_pipeline.jpg?token=AC0Jh5LHfPQDyU_Vii3xzDcNnijLRdUTks5V-ByPwA%3D%3D "R analysis pipeline")
+![r_pipeline](https://raw.githubusercontent.com/DomBennett/PREDICTS-PD/master/other/r_pipeline.jpg?token=AC0Jh05l2WChD8gM7MaQJYfT5OkuzoZlks5WCRrIwA%3D%3D "R analysis pipeline")
 
 Each stage is run once with the exception of `B1_parse.R`, `B2_compare.R` and `B3_metrics.R`
 which are each run twice for comparing the results from unconstrained and constrained
