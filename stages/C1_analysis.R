@@ -103,4 +103,4 @@ anova(m1.pse,m2.pse)
 # OUTPUT
 
 # FINISH
-cat (paste0 ('\nStage 6 finished at [', Sys.time (), ']'))
+cat (paste0 ('\nC1 finished at [', Sys.time (), ']'))

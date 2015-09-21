@@ -77,4 +77,4 @@ for (i in 1:length (studies)) {
 cat ('\nDone. Plotted for [', study.counter, '] studies.', sep='')
 
 # FINISH
-cat (paste0 ('\nStage 7 finished at [', Sys.time (), ']'))
+cat (paste0 ('\nB4 finished at [', Sys.time (), ']'))

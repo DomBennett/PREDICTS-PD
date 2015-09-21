@@ -58,4 +58,4 @@ save (pub.trees, file=file.path (output.dir, 'trees_with_ages.RData'))
 cat('\nDone.')
 
 # FINISH
-cat (paste0 ('\nFinished at [', Sys.time (), ']'))
+cat (paste0 ('\nA2 finished at [', Sys.time (), ']'))

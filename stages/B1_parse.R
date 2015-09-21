@@ -84,4 +84,4 @@ cat ('Done. Discovered [', length (studies),
      '] had mapped distributions', sep='')
 
 # FINISH
-cat (paste0 ('\nStage 4 finished at [', Sys.time (), ']'))
+cat (paste0 ('\nB1 finished at [', Sys.time (), ']'))

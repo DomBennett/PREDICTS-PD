@@ -105,4 +105,4 @@ cat ('Done. Setup for [', names.counter, '] names and [', study.counter, '] stud
      sep='')
 
 # FINISH
-cat (paste0 ('\nStage 1 finished at [', Sys.time (), ']'))
+cat (paste0 ('\nA3 finished at [', Sys.time (), ']'))

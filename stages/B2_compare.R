@@ -151,4 +151,4 @@ save (ph85, score, dmat, ref.trees, ntaxa,
 cat ('\nDone.')
 
 # FINISH
-cat (paste0 ('\nStage 4 finished at [', Sys.time (), ']'))
+cat (paste0 ('\nB2 finished at [', Sys.time (), ']'))

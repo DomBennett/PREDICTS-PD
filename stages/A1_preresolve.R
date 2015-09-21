@@ -49,4 +49,4 @@ outfile <- file.path (output.dir, 'preresolved.RData')
 save (resolve.list, file=outfile)
 
 # FINISH
-cat (paste0 ('\nFinished at [', Sys.time (), ']'))
+cat (paste0 ('\nA1 finished at [', Sys.time (), ']'))

@@ -157,4 +157,4 @@ outfile <- paste0 ('predictsdata_wpd_', normalise, '.rds')
 saveRDS (res, file=file.path(output.dir, outfile))
 
 # FINISH
-cat (paste0 ('\nStage 6 finished at [', Sys.time (), ']'))
+cat (paste0 ('\nB3 finished at [', Sys.time (), ']'))

@@ -75,4 +75,4 @@ cat ('Done. Identified [', length (studies), '] studies of which [', map.counter
      '] names.', sep='')
 
 # FINISH
-cat (paste0 ('\nStage 3 finished at [', Sys.time (), ']'))
+cat (paste0 ('\nA4 finished at [', Sys.time (), ']'))
