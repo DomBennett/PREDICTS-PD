@@ -12,8 +12,8 @@ library (multcomp)
 source (file.path ('tools', 'plotting_tools.R'))
 
 # DIRS
-input.dir <- '6_metrics'
-output.dir <- '8_analysis'
+input.dir <- 'B3_metrics'
+output.dir <- 'C1_analysis'
 if (!file.exists (output.dir)) {
   dir.create (output.dir)
 }
@@ -21,7 +21,7 @@ if (!file.exists (output.dir)) {
 # INPUT
 cat ('\nReading in data ....')
 # read in RDS
-predicts.data <- readRDS (file.path(input.dir, 'predictsdata_wpd.rds'))
+predicts.data <- readRDS (file.path(input.dir, 'predictsdata_wpd_age.rds'))
 # convert to by site
 site_ids <- paste0 (predicts.data$SSID, predicts.data$Site_number)
 predicts.data <- predicts.data[!duplicated (site_ids), ]
