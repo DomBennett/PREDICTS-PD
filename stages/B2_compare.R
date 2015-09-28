@@ -53,7 +53,7 @@ cat ('\nDone')
 # PROCESS
 cat ('\nCalculating tree distance metrics ....')
 # calculate distances between pglt and mapped trees
-ph85 <- score <- dmat <- ntaxa <- ref.trees <-
+ph85 <- score <- dmat <- trip <- ntaxa <- ref.trees <-
   rep (NA, length (trees) * 100)
 count <- 1
 for (i in 1:length (trees)) {
@@ -80,6 +80,7 @@ for (i in 1:length (trees)) {
       ph85[count] <- res[['PH85']]
       score[count] <- res[['score']]
       dmat[count] <- res[['dmat']]
+      trip[count] <- res[['trip']]
       ntaxa[count] <- shared.ntaxa
     }
     count <- count + 1
@@ -91,10 +92,13 @@ p.score.mean <- mean (score, na.rm = TRUE)
 p.score.sd <- sd (score, na.rm = TRUE)
 p.dmat.mean <- mean (dmat, na.rm = TRUE)
 p.dmat.sd <- sd (dmat, na.rm = TRUE)
+p.trip.mean <- mean (trip, na.rm = TRUE)
+p.trip.sd <- sd (trip, na.rm = TRUE)
 cat ('\nDone....')
 cat ('[', p.ph85.mean, '±', p.ph85.sd, '] PH85', sep='')
 cat ('[', p.score.mean, '±', p.score.sd, '] score', sep='')
 cat ('[', p.dmat.mean, '±', p.dmat.sd, '] dmat', sep='')
+cat ('[', p.trip.mean, '±', p.trip.sd, '] triplet', sep='')
 
 # OUTPUT
 cat ('\nPlotting and summarising ....')
@@ -145,8 +149,9 @@ ggBoxplot ('dmat', 'Distance of cophenetic matrices')
 ggScatter ('ph85', 'PH85 (P. Internal Branches) (±SE)')
 ggScatter ('score', 'Score (P. Internal Branches w/ Length) (±SE)')
 ggScatter ('dmat', 'Distance of cophenetic matrices (±SE)')
+ggScatter ('trip', 'Normalise triplet distance (±SE)')
 dev.off ()
-save (ph85, score, dmat, ref.trees, ntaxa,
+save (ph85, score, dmat, trip, ref.trees, ntaxa,
       file = file.path (output.dir, 'results.RData'))
 cat ('\nDone.')
 
